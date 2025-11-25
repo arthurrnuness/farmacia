@@ -80,6 +80,18 @@
   color: #6c757d;
 }
 
+.dia-pequeno.nao-agendado {
+  background: #f8f9fa;
+  color: #adb5bd;
+  border: 1px dashed #dee2e6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dia-pequeno.nao-agendado:hover {
+  transform: none;
+}
+
 /* Legenda */
 .calendario-legenda {
   display: flex;
@@ -124,6 +136,11 @@
 .cor-box.neutro {
   background: #e9ecef;
   border: 1px solid #ced4da;
+}
+
+.cor-box.nao-agendado {
+  background: #f8f9fa;
+  border: 1px dashed #dee2e6;
 }
 
 /* Responsive */
@@ -379,6 +396,19 @@
 .dia-compacto.neutro {
   background: #e9ecef;
   color: #6c757d;
+}
+
+.dia-compacto.nao-agendado {
+  background: #f8f9fa;
+  color: #adb5bd;
+  border: 1px dashed #dee2e6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dia-compacto.nao-agendado:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* Vista Expandida */

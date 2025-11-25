@@ -5,9 +5,9 @@
   ultimo_dia_mes = primeiro_dia_mes.end_of_month
   hoje = Date.today
   
-  # Vista compacta: últimas 2 semanas
-  primeiro_dia_compacto = hoje - 13.days
-  ultimo_dia_compacto = hoje
+  # Vista compacta: mês completo
+  primeiro_dia_compacto = primeiro_dia_mes
+  ultimo_dia_compacto = ultimo_dia_mes
   
   # ID único para cada calendário
   calendario_id = "calendario_#{atividade.id}"
@@ -18,7 +18,7 @@
   <div class="calendario-header">
     <h4 class="calendario-titulo">
       <span class="calendario-periodo">
-        <span class="periodo-compacto">Últimas 2 semanas</span>
+        <span class="periodo-compacto"><%= I18n.t("date.month_names")[mes_atual] %> <%= ano_atual %></span>
         <span class="periodo-expandido" style="display: none;">
           <%= I18n.t("date.month_names")[mes_atual] %> <%= ano_atual %>
         </span>
@@ -35,12 +35,14 @@
   <div class="calendario-compacto">
     <div class="calendario-grid-compacto">
       <% (primeiro_dia_compacto..ultimo_dia_compacto).each do |dia| %>
-        <% next unless atividade.fazer_hoje?(dia) %>
-        
         <%
+          # Verifica se o dia está agendado para esta atividade
+          dia_agendado = atividade.fazer_hoje?(dia)
           registro = atividade.registros.find_by(data: dia)
-          
-          if registro.nil?
+
+          if !dia_agendado
+            cor_classe = 'nao-agendado'
+          elsif registro.nil?
             cor_classe = 'neutro'
           elsif dia == hoje
             cor_classe = 'hoje'
@@ -84,9 +86,13 @@
       <!-- Dias do mês -->
       <% (primeiro_dia_mes..ultimo_dia_mes).each do |dia| %>
         <%
+          # Verifica se o dia está agendado para esta atividade
+          dia_agendado = atividade.fazer_hoje?(dia)
           registro = atividade.registros.find_by(data: dia)
-          
-          if registro.nil?
+
+          if !dia_agendado
+            cor_classe = 'nao-agendado'
+          elsif registro.nil?
             cor_classe = 'neutro'
           elsif dia == hoje
             cor_classe = 'hoje'
@@ -133,5 +139,6 @@
     <span class="legenda-item"><span class="cor-box futuro"></span> Futuro</span>
     <span class="legenda-item"><span class="cor-box nao-feito"></span> Não feito</span>
     <span class="legenda-item"><span class="cor-box neutro"></span> Sem registro</span>
+    <span class="legenda-item"><span class="cor-box nao-agendado"></span> Não agendado</span>
   </div>
 </div>
