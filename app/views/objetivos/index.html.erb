@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Objetivos" %>
+
+<h1>Objetivos</h1>
+
+<div id="objetivos">
+  <% @objetivos.each do |objetivo| %>
+    <%= render objetivo %>
+    <p>
+      <%= link_to "Show this objetivo", objetivo %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New objetivo", new_objetivo_path %>

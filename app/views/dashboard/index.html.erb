@@ -1,0 +1,72 @@
+<!-- app/views/dashboard/index.html.erb -->
+<div class="container">
+  <div class="header">
+    <h1>Meu Progresso</h1>
+    <%= link_to 'Novo Objetivo', new_objetivo_path, class: 'btn btn-primary' %>
+  </div>
+  
+  <!-- Navegação de Meses -->
+  <div class="mes-navegacao">
+    <%= link_to dashboard_path(mes: @mes == 1 ? 12 : @mes - 1, 
+                                ano: @mes == 1 ? @ano - 1 : @ano), 
+                class: 'btn-nav' do %>
+      ← Mês Anterior
+    <% end %>
+    
+    <h2 class="mes-atual">
+      <%= I18n.t("date.month_names")[@mes] %> <%= @ano %>
+    </h2>
+    
+    <%= link_to dashboard_path(mes: @mes == 12 ? 1 : @mes + 1, 
+                                ano: @mes == 12 ? @ano + 1 : @ano), 
+                class: 'btn-nav' do %>
+      Próximo Mês →
+    <% end %>
+    
+    <%= link_to 'Voltar para Hoje', dashboard_path, class: 'btn btn-hoje' %>
+  </div>
+  
+  <% if @objetivos.empty? %>
+    <div class="empty-state">
+      <p>Você ainda não tem objetivos cadastrados.</p>
+      <%= link_to 'Criar primeiro objetivo', new_objetivo_path, class: 'btn btn-primary' %>
+    </div>
+  <% else %>
+    <% @objetivos.each do |objetivo| %>
+      <div class="objetivo-card" style="border-left: 4px solid <%= objetivo || '#666' %>">
+        <div class="objetivo-header">
+          <h2><%= objetivo.nome %></h2>
+          <%= link_to 'Gerenciar', objetivo_path(objetivo), class: 'btn-link' %>
+        </div>
+        
+        <% if objetivo.descricao.present? %>
+          <p class="objetivo-descricao"><%= objetivo.descricao %></p>
+        <% end %>
+        
+        <!-- Atividades do objetivo -->
+        <% objetivo.atividades.where(ativo: true).each do |atividade| %>
+          <div class="atividade-section">
+            <h3 class="atividade-titulo"><%= atividade.nome %></h3>
+            
+            <div class="atividade-progresso-mes">
+              <% progresso_mes = calcular_progresso_mes(atividade, @mes, @ano) %>
+              
+              <div class="progresso-stats">
+                <span class="stat">
+                  <strong><%= progresso_mes[:feitos] %></strong> / <%= progresso_mes[:agendados] %> dias
+                </span>
+                <span class="stat percentual">
+                  <%= progresso_mes[:percentual] %>%
+                </span>
+              </div>
+            </div>
+            
+            <!-- CALENDÁRIO DA ATIVIDADE -->
+            <%= render partial: 'atividades/calendario_mensal', 
+                       locals: { atividade: atividade, mes: @mes, ano: @ano } %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

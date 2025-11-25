@@ -1,0 +1,55 @@
+<!-- app/views/atividades/_form.html.erb -->
+<%= form_with(model: [@objetivo, @atividade], local: true) do |f| %>
+  <% if @atividade.errors.any? %>
+    <div class="errors">
+      <h3><%= pluralize(@atividade.errors.count, "erro") %> encontrado:</h3>
+      <ul>
+        <% @atividade.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <div class="form-group">
+    <%= f.label :nome, 'Nome da atividade *' %>
+    <%= f.text_field :nome, placeholder: 'Ex: Estudar inglês', class: 'form-control' %>
+  </div>
+  
+  <div class="form-group">
+    <%= f.label :descricao, 'Descrição' %>
+    <%= f.text_area :descricao, rows: 3, placeholder: 'Opcional', class: 'form-control' %>
+  </div>
+  
+  <div class="form-group">
+    <%= f.label :frequencia_semanal, 'Quantas vezes por semana? *' %>
+    <%= f.number_field :frequencia_semanal, min: 1, max: 7, value: @atividade.frequencia_semanal || 3, class: 'form-control' %>
+  </div>
+  
+  <div class="form-group">
+    <%= f.label :dias_semana, 'Dias da semana *' %>
+    <div class="dias-semana-checkboxes">
+      <% ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].each_with_index do |dia, index| %>
+        <label class="checkbox-inline">
+          <%= f.check_box :dias_semana, 
+                          { multiple: true, checked: @atividade.dias_semana.include?(dia) }, 
+                          dia, 
+                          nil %>
+          <%= I18n.t("date.day_names")[index] %>
+        </label>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <label>
+      <%= f.check_box :ativo %>
+      Atividade ativa
+    </label>
+  </div>
+  
+  <div class="form-actions">
+    <%= f.submit @atividade.new_record? ? 'Criar Atividade' : 'Atualizar Atividade', class: 'btn btn-primary' %>
+    <%= link_to 'Cancelar', @objetivo, class: 'btn btn-secondary' %>
+  </div>
+<% end %>

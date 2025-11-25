@@ -1,0 +1,53 @@
+<!-- app/views/objetivos/show.html.erb -->
+<div class="container">
+  <%= link_to '← Voltar', dashboard_path, class: 'btn-back' %>
+  
+  <div class="objetivo-detail" style="border-left: 4px solid <%= @objetivo || '#666' %>">
+    <h1><%= @objetivo.nome %></h1>
+    
+    <% if @objetivo.descricao.present? %>
+      <p><%= @objetivo.descricao %></p>
+    <% end %>
+    
+    <div class="actions">
+      <%= link_to 'Editar', edit_objetivo_path(@objetivo), class: 'btn btn-secondary' %>
+      <%= link_to 'Adicionar Atividade', new_objetivo_atividade_path(@objetivo), class: 'btn btn-primary' %>
+      <%= button_to 'Excluir Objetivo', @objetivo, method: :delete, 
+                    data: { confirm: 'Tem certeza?' }, class: 'btn btn-danger' %>
+    </div>
+  </div>
+  
+  <h2>Atividades (<%= @atividades.count %>)</h2>
+  
+  <% if @atividades.any? %>
+    <div class="atividades-list">
+      <% @atividades.each do |atividade| %>
+        <div class="atividade-card <%= 'inativa' unless atividade.ativo %>">
+          <h3><%= atividade.nome %></h3>
+          
+          <% if atividade.descricao.present? %>
+            <p><%= atividade.descricao %></p>
+          <% end %>
+          
+          <div class="atividade-meta">
+            <span><%= atividade.frequencia_semanal %>x por semana</span>
+            <span>Dias: <%= atividade.dias_semana.map { |d| I18n.t("date.day_names")[Date::DAYNAMES.index(d.capitalize)] }.join(', ') %></span>
+          </div>
+          
+          <div class="atividade-progresso">
+            Semana atual: <%= atividade.progresso_semana[:feitos] %> / <%= atividade.frequencia_semanal %>
+            <%= '✅' if atividade.meta_semanal_atingida? %>
+          </div>
+          
+          <div class="atividade-actions">
+            <%= link_to 'Ver detalhes', objetivo_atividade_path(@objetivo, atividade), class: 'btn-link' %>
+            <%= link_to 'Editar', edit_objetivo_atividade_path(@objetivo, atividade), class: 'btn-link' %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="empty-state">Nenhuma atividade cadastrada ainda.</p>
+    <%= link_to 'Criar primeira atividade', new_objetivo_atividade_path(@objetivo), class: 'btn btn-primary' %>
+  <% end %>
+</div>

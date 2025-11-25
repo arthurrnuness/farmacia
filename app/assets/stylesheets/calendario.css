@@ -1,0 +1,77 @@
+
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin: 20px 0;
+}
+
+.dia-semana-header {
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  background: #f0f0f0;
+}
+
+.dia-cell {
+  min-height: 100px;
+  padding: 10px;
+  border-radius: 8px;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.dia-cell.hoje {
+  border-color: #007bff;
+  box-shadow: 0 0 10px rgba(0,123,255,0.3);
+}
+
+.dia-cell.completo {
+  background: #4CAF50;
+  color: white;
+}
+
+.dia-cell.parcial {
+  background: #FFC107;
+  color: white;
+}
+
+.dia-cell.incompleto {
+  background: #f44336;
+  color: white;
+}
+
+.dia-cell.vazio {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.dia-numero {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.dia-progresso {
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+.legenda {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legenda-item .cor {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+}

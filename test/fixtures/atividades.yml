@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  objetivo: one
+  nome: MyString
+  descricao: MyText
+  frequencia_semanal: 1
+  dias_semana: MyText
+  ativo: false
+
+two:
+  objetivo: two
+  nome: MyString
+  descricao: MyText
+  frequencia_semanal: 1
+  dias_semana: MyText
+  ativo: false

@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Registros" %>
+
+<h1>Registros</h1>
+
+<div id="registros">
+  <% @registros.each do |registro| %>
+    <%= render registro %>
+    <p>
+      <%= link_to "Show this registro", registro %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New registro", new_registro_path %>

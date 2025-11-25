@@ -1,0 +1,46 @@
+<!-- app/views/registros/new.html.erb -->
+<div class="modal-overlay" onclick="history.back()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Criar Registro</h2>
+      <button onclick="history.back()" class="btn-close">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <p class="registro-info">
+        <strong><%= @atividade.nome %></strong><br>
+        <%= @registro.data.strftime('%d/%m/%Y - %A') %>
+      </p>
+      
+      <div class="info-aviso">
+        ℹ️ Este dia não estava originalmente agendado para esta atividade, mas você pode criar um registro extra.
+      </div>
+      
+      <%= form_with(model: @registro, url: registros_path, local: true) do |form| %>
+        <%= form.hidden_field :data %>
+        
+        <div class="form-group">
+          <%= form.hidden_field :atividade_id, value: @atividade.id %>
+          
+          <label class="checkbox-label-grande">
+            <%= form.check_box :concluido, class: 'checkbox-grande' %>
+            <span>Atividade concluída</span>
+          </label>
+        </div>
+        
+        <div class="form-group">
+          <%= form.label :observacao, 'Observações / Comentários' %>
+          <%= form.text_area :observacao, 
+                            rows: 4, 
+                            placeholder: 'Adicione suas notas sobre esta atividade...',
+                            class: 'form-control' %>
+        </div>
+        
+        <div class="form-actions">
+          <%= form.submit 'Criar Registro', class: 'btn btn-primary' %>
+          <%= link_to 'Cancelar', 'javascript:history.back()', class: 'btn btn-secondary' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

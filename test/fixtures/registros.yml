@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  atividade: one
+  data: 2025-10-27
+  concluido: false
+  observacao: MyText
+
+two:
+  atividade: two
+  data: 2025-10-27
+  concluido: false
+  observacao: MyText

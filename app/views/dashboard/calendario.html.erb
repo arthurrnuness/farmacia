@@ -1,0 +1,67 @@
+<!-- app/views/dashboard/calendario.html.erb -->
+<div class="container">
+  <div class="calendario-header">
+    <h1>Calendário - <%= I18n.t("date.month_names")[@mes] %> <%= @ano %></h1>
+    
+    <div class="navegacao-mes">
+      <%= link_to '← Mês anterior', 
+                  calendario_path(mes: @mes == 1 ? 12 : @mes - 1, 
+                                  ano: @mes == 1 ? @ano - 1 : @ano), 
+                  class: 'btn' %>
+      
+      <%= link_to 'Hoje', calendario_path, class: 'btn btn-primary' %>
+      
+      <%= link_to 'Próximo mês →', 
+                  calendario_path(mes: @mes == 12 ? 1 : @mes + 1, 
+                                  ano: @mes == 12 ? @ano + 1 : @ano), 
+                  class: 'btn' %>
+    </div>
+  </div>
+  
+  <div class="calendario-grid">
+    <!-- Cabeçalho dos dias da semana -->
+    <% ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].each do |dia| %>
+      <div class="dia-semana-header"><%= dia %></div>
+    <% end %>
+    
+    <!-- Células vazias antes do primeiro dia -->
+    <% @data_inicio.wday.times do %>
+      <div class="dia-vazio"></div>
+    <% end %>
+    
+    <!-- Dias do mês -->
+    <% @dias_mes.each do |info| %>
+      <div class="dia-cell <%= cor_dia(info[:percentual]) %> <%= 'hoje' if info[:dia] == Date.today %>">
+        <div class="dia-numero"><%= info[:dia].day %></div>
+        
+        <% if info[:total] > 0 %>
+          <div class="dia-progresso">
+            <%= info[:feitas] %>/<%= info[:total] %>
+          </div>
+          
+          <div class="dia-percentual">
+            <%= info[:percentual] %>%
+          </div>
+        <% end %>
+        
+        <%= link_to 'Ver', dashboard_path(data: info[:dia]), class: 'dia-link' %>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Legenda -->
+  <div class="legenda">
+    <div class="legenda-item">
+      <span class="cor completo"></span> 100% - Tudo feito
+    </div>
+    <div class="legenda-item">
+      <span class="cor parcial"></span> 50-99% - Parcial
+    </div>
+    <div class="legenda-item">
+      <span class="cor incompleto"></span> 0-49% - Incompleto
+    </div>
+    <div class="legenda-item">
+      <span class="cor vazio"></span> Sem atividades
+    </div>
+  </div>
+</div>
