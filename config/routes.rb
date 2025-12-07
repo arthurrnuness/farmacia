@@ -1,22 +1,28 @@
 require 'sidekiq/web'
 Rails.application.routes.draw do
-  resources :registros
-  resources :atividades
-  resources :objetivos
   devise_for :users
 
   root 'dashboard#index'
-  resources :objetivos do
-    resources :atividades
+
+  resources :habitos do
+    member do
+      get 'progresso'
+    end
   end
-
-  resources :atividades
-
   resources :registros, only: [:new, :create, :edit, :update]
 
   get 'dashboard', to: 'dashboard#index'
+  get 'dashboard/grid', to: 'dashboard#grid'
 
   post 'registros/toggle', to: 'registros#toggle'
+  post 'registros/editar_ou_criar', to: 'registros#editar_ou_criar'
+
+  # Payment routes
+  get 'payments/new', to: 'payments#new', as: 'payments_new'
+  post 'payments/create-checkout-session', to: 'payments#create_checkout_session', as: 'create_checkout_session'
+  get 'payments/success', to: 'payments#success', as: 'payments_success'
+  get 'payments/cancel', to: 'payments#cancel', as: 'payments_cancel'
+  post 'payments/webhook', to: 'payments#webhook'
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

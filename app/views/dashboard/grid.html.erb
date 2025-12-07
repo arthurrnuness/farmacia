@@ -1,0 +1,237 @@
+<!-- app/views/dashboard/grid.html.erb -->
+<div class="container">
+  <div class="header">
+    <h1>Meus Hábitos - Visualização em Grade</h1>
+    <div class="header-actions">
+      <%= link_to 'Ver Cards', dashboard_path(mes: @mes, ano: @ano), class: 'btn btn-secondary' %>
+      <%= link_to 'Novo Hábito', new_habito_path, class: 'btn btn-primary' %>
+    </div>
+  </div>
+
+  <!-- Navegação de Meses -->
+  <div class="mes-navegacao">
+    <%= link_to dashboard_grid_path(mes: @mes == 1 ? 12 : @mes - 1,
+                                ano: @mes == 1 ? @ano - 1 : @ano),
+                class: 'btn-nav' do %>
+      ← Mês Anterior
+    <% end %>
+
+    <h2 class="mes-atual">
+      <%= I18n.t("date.month_names")[@mes] %> <%= @ano %>
+    </h2>
+
+    <%= link_to dashboard_grid_path(mes: @mes == 12 ? 1 : @mes + 1,
+                                ano: @mes == 12 ? @ano + 1 : @ano),
+                class: 'btn-nav' do %>
+      Próximo Mês →
+    <% end %>
+
+    <%= link_to 'Voltar para Hoje', dashboard_grid_path, class: 'btn btn-hoje' %>
+
+    <button id="btn-toggle-periodo-grid" class="btn-periodo-grid">
+      <span class="texto-mes-grid">Ver Mês Inteiro</span>
+      <span class="texto-semana-grid" style="display: none;">Ver Semana Atual</span>
+    </button>
+  </div>
+
+  <!-- Filtro de Tags -->
+  <% if current_user.tags.any? %>
+    <div class="tags-filter">
+      <button class="tag-filter active" data-tag-id="all">Todos</button>
+      <% current_user.tags.each do |tag| %>
+        <button class="tag-filter" data-tag-id="<%= tag.id %>" style="background-color: <%= tag.cor %>">
+          <%= tag.nome %>
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @habitos.empty? %>
+    <div class="empty-state">
+      <p>Você ainda não tem hábitos cadastrados.</p>
+      <%= link_to 'Criar primeiro hábito', new_habito_path, class: 'btn btn-primary' %>
+    </div>
+  <% else %>
+    <!-- Tabela de Hábitos em Grid - Vista Semanal (Padrão) -->
+    <div class="habitos-grid-wrapper vista-semanal-grid">
+      <table class="habitos-grid-table">
+        <thead>
+          <tr>
+            <th class="habito-nome-col">Hábito</th>
+            <% @dias_semana.each do |dia| %>
+              <th class="dia-col <%= 'dia-hoje-col' if dia == Date.today %>">
+                <div><%= I18n.t('date.abbr_day_names')[dia.wday] %></div>
+                <div style="font-size: 0.9em;"><%= dia.day %></div>
+              </th>
+            <% end %>
+            <th class="progresso-col">Progresso</th>
+            <th class="acao-col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @habitos.each do |habito| %>
+            <% progresso_mes = calcular_progresso_mes(habito, @mes, @ano) %>
+            <tr class="habito-row" data-tag-ids="<%= habito.tag_ids.join(',') %>">
+              <td class="habito-nome-cell">
+                <div class="habito-info">
+                  <strong><%= habito.nome %></strong>
+                  <% if habito.tags.any? %>
+                    <div class="habito-tags-mini">
+                      <% habito.tags.each do |tag| %>
+                        <span class="tag-badge-mini" style="background-color: <%= tag.cor %>">
+                          <%= tag.nome %>
+                        </span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
+
+              <% @dias_semana.each do |dia| %>
+                <%
+                  agendado = habito.fazer_hoje?(dia)
+                  feito = habito.feito_no_dia?(dia)
+                  hoje = dia == Date.today
+                  futuro = dia > Date.today
+
+                  css_class = if feito
+                    'dia-feito'
+                  elsif !agendado
+                    'dia-nao-agendado'
+                  elsif hoje
+                    'dia-hoje'
+                  elsif futuro
+                    'dia-futuro'
+                  else
+                    'dia-nao-feito'
+                  end
+                %>
+                <td class="dia-cell <%= css_class %>"
+                    data-habito-id="<%= habito.id %>"
+                    data-dia="<%= dia %>"
+                    title="<%= dia.strftime('%d/%m/%Y') %>">
+                  <% if (agendado || feito) && !futuro %>
+                    <div class="dia-status">
+                      <%= feito ? '✓' : '○' %>
+                    </div>
+                  <% end %>
+                </td>
+              <% end %>
+
+              <td class="progresso-cell" data-habito-id="<%= habito.id %>">
+                <div class="progresso-mini">
+                  <span class="percentual"><%= progresso_mes[:percentual] %>%</span>
+                  <span class="detalhes"><%= progresso_mes[:feitos] %>/<%= progresso_mes[:agendados] %></span>
+                </div>
+              </td>
+
+              <td class="acao-cell">
+                <%= link_to 'Ver', habito_path(habito), class: 'btn-ver-mini' %>
+                <%= link_to 'Editar', edit_habito_path(habito), class: 'btn-edit-mini' %>
+                <%= button_to 'Excluir', habito_path(habito),
+                    method: :delete,
+                    data: { confirm: 'Tem certeza? Isso excluirá todos os registros deste hábito.' },
+                    class: 'btn-excluir-mini' %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tabela de Hábitos em Grid - Vista Mensal -->
+    <div class="habitos-grid-wrapper vista-mensal-grid" style="display: none;">
+      <table class="habitos-grid-table">
+        <thead>
+          <tr>
+            <th class="habito-nome-col">Hábito</th>
+            <% @dias_mes.each do |dia| %>
+              <th class="dia-col <%= 'dia-hoje-col' if dia == Date.today %>">
+                <%= dia.day %>
+              </th>
+            <% end %>
+            <th class="progresso-col">Progresso</th>
+            <th class="acao-col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @habitos.each do |habito| %>
+            <% progresso_mes = calcular_progresso_mes(habito, @mes, @ano) %>
+            <tr class="habito-row" data-tag-ids="<%= habito.tag_ids.join(',') %>">
+              <td class="habito-nome-cell">
+                <div class="habito-info">
+                  <strong><%= habito.nome %></strong>
+                  <% if habito.tags.any? %>
+                    <div class="habito-tags-mini">
+                      <% habito.tags.each do |tag| %>
+                        <span class="tag-badge-mini" style="background-color: <%= tag.cor %>">
+                          <%= tag.nome %>
+                        </span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
+
+              <% @dias_mes.each do |dia| %>
+                <%
+                  agendado = habito.fazer_hoje?(dia)
+                  feito = habito.feito_no_dia?(dia)
+                  hoje = dia == Date.today
+                  futuro = dia > Date.today
+
+                  css_class = if feito
+                    'dia-feito'
+                  elsif !agendado
+                    'dia-nao-agendado'
+                  elsif hoje
+                    'dia-hoje'
+                  elsif futuro
+                    'dia-futuro'
+                  else
+                    'dia-nao-feito'
+                  end
+                %>
+                <td class="dia-cell <%= css_class %>"
+                    data-habito-id="<%= habito.id %>"
+                    data-dia="<%= dia %>"
+                    title="<%= dia.strftime('%d/%m/%Y') %>">
+                  <% if (agendado || feito) && !futuro %>
+                    <div class="dia-status">
+                      <%= feito ? '✓' : '○' %>
+                    </div>
+                  <% end %>
+                </td>
+              <% end %>
+
+              <td class="progresso-cell" data-habito-id="<%= habito.id %>">
+                <div class="progresso-mini">
+                  <span class="percentual"><%= progresso_mes[:percentual] %>%</span>
+                  <span class="detalhes"><%= progresso_mes[:feitos] %>/<%= progresso_mes[:agendados] %></span>
+                </div>
+              </td>
+
+              <td class="acao-cell">
+                <%= link_to 'Ver', habito_path(habito), class: 'btn-ver-mini' %>
+                <%= link_to 'Editar', edit_habito_path(habito), class: 'btn-edit-mini' %>
+                <%= button_to 'Excluir', habito_path(habito),
+                    method: :delete,
+                    data: { confirm: 'Tem certeza? Isso excluirá todos os registros deste hábito.' },
+                    class: 'btn-excluir-mini' %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Legenda -->
+    <div class="grid-legenda">
+      <div class="legenda-item"><span class="cor-demo dia-feito"></span> Feito</div>
+      <div class="legenda-item"><span class="cor-demo dia-hoje"></span> Hoje</div>
+      <div class="legenda-item"><span class="cor-demo dia-nao-feito"></span> Não feito</div>
+      <div class="legenda-item"><span class="cor-demo dia-futuro"></span> Futuro</div>
+      <div class="legenda-item"><span class="cor-demo dia-nao-agendado"></span> Não agendado</div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,55 @@
+<%= form_with(model: @habito, local: true) do |form| %>
+  <% if @habito.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(@habito.errors.count, "erro") %> encontrado:</h2>
+
+      <ul>
+        <% @habito.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <div>
+    <%= form.label :nome, style: "display: block" %>
+    <%= form.text_field :nome %>
+  </div>
+
+  <div>
+    <%= form.label :descricao, style: "display: block" %>
+    <%= form.textarea :descricao %>
+  </div>
+
+  <div>
+    <%= form.label :frequencia_semanal, style: "display: block" %>
+    <%= form.number_field :frequencia_semanal %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :dias_semana, 'Dias da semana *' %>
+    <div class="dias-semana-checkboxes">
+      <% [['Segunda', 'monday'], ['Terça', 'tuesday'], ['Quarta', 'wednesday'],
+          ['Quinta', 'thursday'], ['Sexta', 'friday'], ['Sábado', 'saturday'],
+          ['Domingo', 'sunday']].each do |nome, valor| %>
+        <label class="checkbox-inline">
+          <%= check_box_tag 'habito[dias_semana][]', valor,
+                            @habito.dias_semana&.include?(valor) %>
+          <%= nome %>
+        </label>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render 'tag_selector', form: form %>
+
+  <div>
+    <%= form.label :ativo, style: "display: block" %>
+    <%= form.checkbox :ativo %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

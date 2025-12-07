@@ -1,0 +1,184 @@
+<%
+  mes_atual = mes
+  ano_atual = ano
+  primeiro_dia_mes = Date.new(ano_atual, mes_atual, 1)
+  ultimo_dia_mes = primeiro_dia_mes.end_of_month
+  hoje = Date.today
+  
+  # Vista compacta: todos os dias do mês
+  primeiro_dia_compacto = primeiro_dia_mes
+  ultimo_dia_compacto = ultimo_dia_mes
+
+  # Vista semanal: último domingo até próximo sábado
+  inicio_semana = hoje - hoje.wday.days  # Último domingo
+  fim_semana = inicio_semana + 6.days     # Próximo sábado
+
+  # ID único para cada calendário
+  calendario_id = "calendario_#{habito.id}"
+%>
+
+<div class="calendario-habito" id="<%= calendario_id %>">
+  <!-- Cabeçalho com botão expandir -->
+  <div class="calendario-header">
+    <h4 class="calendario-titulo">
+      <span class="calendario-periodo">
+        <span class="periodo-compacto"><%= I18n.t("date.month_names")[mes_atual] %> <%= ano_atual %></span>
+        <span class="periodo-expandido" style="display: none;">
+          <%= I18n.t("date.month_names")[mes_atual] %> <%= ano_atual %>
+        </span>
+      </span>
+    </h4>
+
+    <div class="calendario-acoes">
+      <button class="btn-periodo" onclick="togglePeriodo('<%= calendario_id %>')">
+        <span class="texto-semana">Ver mês inteiro</span>
+        <span class="texto-mes" style="display: none;">Ver semana atual</span>
+      </button>
+
+      <button class="btn-expandir" onclick="toggleCalendario('<%= calendario_id %>')">
+        <span class="icone-expandir">▼</span>
+        <span class="icone-recolher" style="display: none;">▲</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Vista Compacta (padrão) -->
+  <div class="calendario-compacto">
+    <!-- Vista Semanal (padrão) -->
+    <div class="calendario-grid-compacto vista-semanal">
+      <% (inicio_semana..fim_semana).each do |dia| %>
+        <%
+          registro = habito.registros.find_by(data: dia)
+          dia_agendado = habito.fazer_hoje?(dia)
+
+          if registro.nil?
+            cor_classe = dia_agendado ? 'neutro' : 'nao-agendado'
+          elsif dia == hoje
+            cor_classe = 'hoje'
+          elsif dia > hoje
+            cor_classe = 'futuro'
+          elsif registro.concluido?
+            cor_classe = 'feito'
+          else
+            cor_classe = 'nao-feito'
+          end
+        %>
+
+        <div class="dia-compacto-wrapper">
+          <%= link_to registro ? edit_registro_path(registro) : new_registro_path(habito_id: habito.id, data: dia),
+                      class: "dia-compacto #{cor_classe}",
+                      title: "#{dia.strftime('%d/%m/%Y - %A')}" do %>
+            <div class="dia-numero-compacto"><%= dia.day %></div>
+            <div class="dia-semana-compacto"><%= dia.strftime('%a')[0..2] %></div>
+            <% if registro&.observacao.present? %>
+              <span class="tem-nota-compacto">📝</span>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Vista Mensal (oculta por padrão) -->
+    <div class="calendario-grid-compacto vista-mensal" style="display: none;">
+      <% (primeiro_dia_compacto..ultimo_dia_compacto).each do |dia| %>
+        <%
+          registro = habito.registros.find_by(data: dia)
+          dia_agendado = habito.fazer_hoje?(dia)
+
+          if registro.nil?
+            cor_classe = dia_agendado ? 'neutro' : 'nao-agendado'
+          elsif dia == hoje
+            cor_classe = 'hoje'
+          elsif dia > hoje
+            cor_classe = 'futuro'
+          elsif registro.concluido?
+            cor_classe = 'feito'
+          else
+            cor_classe = 'nao-feito'
+          end
+        %>
+
+        <div class="dia-compacto-wrapper">
+          <%= link_to registro ? edit_registro_path(registro) : new_registro_path(habito_id: habito.id, data: dia),
+                      class: "dia-compacto #{cor_classe}",
+                      title: "#{dia.strftime('%d/%m/%Y - %A')}" do %>
+            <div class="dia-numero-compacto"><%= dia.day %></div>
+            <div class="dia-semana-compacto"><%= dia.strftime('%a')[0..2] %></div>
+            <% if registro&.observacao.present? %>
+              <span class="tem-nota-compacto">📝</span>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- Vista Expandida (inicialmente oculta) -->
+  <div class="calendario-expandido" style="display: none;">
+    <div class="calendario-grid-pequeno">
+      <!-- Cabeçalho dias da semana -->
+      <% ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].each do |dia| %>
+        <div class="dia-header-pequeno"><%= dia %></div>
+      <% end %>
+      
+      <!-- Células vazias antes do primeiro dia -->
+      <% primeiro_dia_mes.wday.times do %>
+        <div class="dia-vazio-pequeno"></div>
+      <% end %>
+      
+      <!-- Dias do mês -->
+      <% (primeiro_dia_mes..ultimo_dia_mes).each do |dia| %>
+        <%
+          registro = habito.registros.find_by(data: dia)
+          dia_agendado = habito.fazer_hoje?(dia)
+
+          if registro.nil?
+            cor_classe = dia_agendado ? 'neutro' : 'nao-agendado'
+          elsif dia == hoje
+            cor_classe = 'hoje'
+          elsif dia > hoje
+            cor_classe = 'futuro'
+          elsif registro.concluido?
+            cor_classe = 'feito'
+          else
+            cor_classe = 'nao-feito'
+          end
+        %>
+        
+        <%= link_to registro ? edit_registro_path(registro) : new_registro_path(habito_id: habito.id, data: dia), 
+                    class: "dia-pequeno #{cor_classe}", 
+                    title: "#{dia.strftime('%d/%m/%Y')} - Clique para #{registro ? 'editar' : 'criar registro'}" do %>
+          <%= dia.day %>
+          <% if registro&.observacao.present? %>
+            <span class="tem-nota">📝</span>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+    
+    <!-- Estatísticas do mês -->
+    <div class="calendario-stats">
+      <% progresso = calcular_progresso_mes(habito, mes, ano) %>
+      
+      <div class="stat-item">
+        <span class="stat-label">Taxa de conclusão:</span>
+        <span class="stat-valor"><%= progresso[:percentual] %>%</span>
+      </div>
+      
+      <div class="stat-item">
+        <span class="stat-label">Dias feitos:</span>
+        <span class="stat-valor"><%= progresso[:feitos] %> / <%= progresso[:agendados] %></span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Legenda (sempre visível) -->
+  <div class="calendario-legenda">
+    <span class="legenda-item"><span class="cor-box feito"></span> Feito</span>
+    <span class="legenda-item"><span class="cor-box hoje"></span> Hoje</span>
+    <span class="legenda-item"><span class="cor-box futuro"></span> Futuro</span>
+    <span class="legenda-item"><span class="cor-box nao-feito"></span> Não feito</span>
+    <span class="legenda-item"><span class="cor-box neutro"></span> Sem registro</span>
+    <span class="legenda-item"><span class="cor-box nao-agendado"></span> Não agendado</span>
+  </div>
+</div>

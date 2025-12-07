@@ -8,7 +8,7 @@
     
     <div class="modal-body">
       <p class="registro-info">
-        <strong><%= @registro.atividade.nome %></strong><br>
+        <strong><%= @registro.habito.nome %></strong><br>
         <%= @registro.data.strftime('%d/%m/%Y - %A') %>
       </p>
       
@@ -16,7 +16,7 @@
         <div class="form-group">
           <label class="checkbox-label-grande">
             <%= form.check_box :concluido, class: 'checkbox-grande' %>
-            <span>Atividade concluída</span>
+            <span>Hábito concluída</span>
           </label>
         </div>
         

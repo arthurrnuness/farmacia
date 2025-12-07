@@ -1,0 +1,22 @@
+<div class="habito-item">
+  <div class="habito-info">
+    <h3><%= link_to habito.nome, habito_path(habito) %></h3>
+    <% if habito.descricao.present? %>
+      <p class="descricao"><%= habito.descricao %></p>
+    <% end %>
+    <div class="habito-meta">
+      <span class="frequencia"><%= habito.frequencia_semanal %>x por semana</span>
+      <span class="status <%= habito.ativo? ? 'ativo' : 'inativo' %>">
+        <%= habito.ativo? ? '✓ Ativo' : '✗ Inativo' %>
+      </span>
+    </div>
+  </div>
+
+  <div class="habito-actions">
+    <%= link_to 'Ver', habito_path(habito), class: 'btn btn-sm btn-info' %>
+    <%= link_to 'Editar', edit_habito_path(habito), class: 'btn btn-sm btn-secondary' %>
+    <%= link_to 'Excluir', habito_path(habito), method: :delete,
+                data: { confirm: 'Tem certeza? Isso excluirá todos os registros deste hábito.' },
+                class: 'btn btn-sm btn-danger' %>
+  </div>
+</div>

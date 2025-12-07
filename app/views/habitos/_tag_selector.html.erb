@@ -1,0 +1,33 @@
+<!-- Seletor de Tags -->
+<div class="form-group tag-selector">
+  <%= form.label :tags, 'Tags' %>
+
+  <!-- Tags existentes -->
+  <div class="existing-tags">
+    <% current_user.tags.each do |tag| %>
+      <label class="tag-checkbox">
+        <%= check_box_tag 'habito[tag_ids][]', tag.id, @habito.tags.include?(tag), id: "tag_#{tag.id}" %>
+        <span class="tag-badge" style="background-color: <%= tag.cor %>">
+          <%= tag.nome %>
+        </span>
+      </label>
+    <% end %>
+  </div>
+
+  <!-- Criar nova tag -->
+  <div class="new-tag-section">
+    <h4>Ou criar nova tag:</h4>
+    <div class="new-tag-fields">
+      <%= text_field_tag 'habito[new_tag_name]', '', placeholder: 'Nome da tag (ex: Saúde)', class: 'form-control' %>
+
+      <select name="habito[new_tag_cor]" class="form-control color-picker">
+        <option value="">Cor aleatória</option>
+        <% Tag::CORES_PADRAO.each do |cor| %>
+          <option value="<%= cor %>" style="background-color: <%= cor %>; color: white;">
+            <%= cor %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+  </div>
+</div>

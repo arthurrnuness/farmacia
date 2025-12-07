@@ -1,7 +1,71 @@
 /* app/assets/stylesheets/dashboard.css */
 
+/* Header Actions */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-ver-hoje {
+  padding: 10px 20px;
+  background: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-ver-hoje:hover {
+  background: #138496;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(23,162,184,0.3);
+}
+
+.btn-ver-hoje.active {
+  background: #28a745;
+}
+
+.btn-ver-hoje.active:hover {
+  background: #218838;
+}
+
+/* Visualização "Ver Hoje" */
+.dia-hoje-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  margin: 15px 0;
+  background: #f8f9fa;
+  border-radius: 8px;
+  min-height: 100px;
+}
+
+.dia-hoje-ampliado {
+  transform: scale(1.5);
+  padding: 20px !important;
+  min-width: 80px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.sem-agendamento {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  margin: 0;
+}
+
 /* Calendário da atividade */
-.calendario-atividade {
+.calendario-habito {
   margin-top: 15px;
   padding: 15px;
   background: white;
@@ -80,6 +144,12 @@
   color: #6c757d;
 }
 
+.dia-pequeno.nao-agendado {
+  background: #f8f9fa;
+  color: #adb5bd;
+  opacity: 0.6;
+}
+
 /* Legenda */
 .calendario-legenda {
   display: flex;
@@ -124,6 +194,12 @@
 .cor-box.neutro {
   background: #e9ecef;
   border: 1px solid #ced4da;
+}
+
+.cor-box.nao-agendado {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  opacity: 0.6;
 }
 
 /* Responsive */
@@ -202,20 +278,20 @@
   background: #218838;
 }
 
-.atividade-section {
+.habito-progresso-mes {
   margin: 20px 0;
   padding: 15px;
   background: #f8f9fa;
   border-radius: 8px;
 }
 
-.atividade-titulo {
+.habito-titulo {
   margin: 0 0 15px 0;
   font-size: 1.2em;
   color: #495057;
 }
 
-.atividade-progresso-mes {
+.habito-stats {
   margin-bottom: 15px;
 }
 
@@ -280,6 +356,31 @@
   align-items: center;
   gap: 10px;
   margin: 0;
+}
+
+.calendario-acoes {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-periodo {
+  background: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.85em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.btn-periodo:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-2px);
 }
 
 .btn-expandir {
@@ -381,6 +482,12 @@
   color: #6c757d;
 }
 
+.dia-compacto.nao-agendado {
+  background: #f8f9fa;
+  color: #adb5bd;
+  opacity: 0.6;
+}
+
 /* Vista Expandida */
 .calendario-expandido {
   animation: expandir 0.3s ease-out;
@@ -428,20 +535,953 @@
 
 /* Responsive para vista compacta */
 @media (max-width: 768px) {
+  .calendario-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .calendario-acoes {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btn-periodo {
+    flex: 1;
+    padding: 10px;
+  }
+
   .calendario-grid-compacto {
     gap: 6px;
   }
-  
+
   .dia-compacto {
     min-width: 45px;
     padding: 8px 6px;
   }
-  
+
   .dia-numero-compacto {
     font-size: 1.1em;
   }
-  
+
   .dia-semana-compacto {
     font-size: 0.7em;
+  }
+}
+/* Tags Styles */
+.tags-filter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tag-filter {
+  padding: 8px 16px;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: #e9ecef;
+  color: #495057;
+  font-size: 0.9em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tag-filter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.tag-filter.active {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+  color: white;
+}
+
+.tag-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75em;
+  font-weight: 500;
+  color: white;
+  margin-right: 6px;
+  margin-bottom: 4px;
+}
+
+.habito-title-section {
+  flex: 1;
+}
+
+.habito-tags {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.habito-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Tag Selector Form */
+.tag-selector {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.existing-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tag-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.tag-checkbox input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+.new-tag-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #dee2e6;
+}
+
+.new-tag-section h4 {
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  color: #6c757d;
+}
+
+.new-tag-fields {
+  display: flex;
+  gap: 10px;
+}
+
+.new-tag-fields input,
+.new-tag-fields select {
+  flex: 1;
+}
+
+.color-picker option {
+  padding: 8px;
+}
+
+@media (max-width: 768px) {
+  .tags-filter {
+    gap: 8px;
+  }
+
+  .tag-filter {
+    padding: 6px 12px;
+    font-size: 0.85em;
+  }
+
+  .new-tag-fields {
+    flex-direction: column;
+  }
+}
+
+/* Layout compacto dos hábitos */
+.habito-card {
+  margin-bottom: 10px;
+  padding: 15px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: all 0.3s;
+}
+
+.habito-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+.habito-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 25px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.habito-title-section {
+  flex: 1;
+}
+
+.habito-title-section h2 {
+  font-size: 1.3em;
+  margin: 0 0 6px 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.habito-descricao {
+  margin: 6px 0 0 0;
+  font-size: 0.85em;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+.habito-progresso-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.progresso-percentual {
+  font-size: 2em;
+  font-weight: bold;
+  color: #28a745;
+  line-height: 1;
+}
+
+.progresso-detalhes {
+  font-size: 0.85em;
+  color: #6c757d;
+  text-align: right;
+}
+
+.progresso-detalhes strong {
+  color: #007bff;
+  font-size: 1.1em;
+}
+
+.btn-link-editar {
+  padding: 6px 14px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.85em;
+  font-weight: 500;
+  transition: all 0.3s;
+  margin-top: 4px;
+}
+
+.btn-link-editar:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+/* Calendário mais compacto */
+.calendario-habito {
+  margin-top: 10px;
+  padding: 12px;
+  background: #fafbfc;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.calendario-grid-pequeno {
+  gap: 3px;
+}
+
+.dia-pequeno {
+  padding: 6px;
+  font-size: 0.8em;
+}
+
+.dia-header-pequeno {
+  padding: 4px;
+  font-size: 0.7em;
+}
+
+.calendario-legenda {
+  padding-top: 8px;
+  gap: 10px;
+}
+
+.legenda-item {
+  font-size: 0.75em;
+}
+
+.cor-box {
+  width: 16px;
+  height: 16px;
+}
+
+/* Ajustes para calendário compacto */
+.calendario-compacto {
+  margin-bottom: 10px;
+}
+
+.dia-compacto {
+  padding: 8px 6px;
+  min-width: 45px;
+}
+
+.dia-numero-compacto {
+  font-size: 1.1em;
+}
+
+.dia-semana-compacto {
+  font-size: 0.7em;
+}
+
+.btn-periodo,
+.btn-expandir {
+  padding: 6px 10px;
+  font-size: 0.8em;
+}
+
+/* ========================================
+   VISUALIZAÇÃO EM GRID
+   ======================================== */
+
+.habitos-grid-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.habitos-grid-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  min-width: 1200px;
+}
+
+.habitos-grid-table thead th {
+  background: #f8f9fa;
+  padding: 12px 6px;
+  text-align: center;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.habito-nome-col {
+  text-align: left !important;
+  padding-left: 20px !important;
+  min-width: 200px;
+  max-width: 250px;
+}
+
+.dia-col {
+  width: 32px;
+  min-width: 32px;
+  font-size: 0.85em;
+  padding: 8px 4px !important;
+}
+
+.dia-hoje-col {
+  background: #fff3cd;
+  font-weight: bold;
+  color: #856404;
+}
+
+.progresso-col {
+  min-width: 100px;
+  background: #f8f9fa;
+}
+
+.acao-col {
+  min-width: 80px;
+  background: #f8f9fa;
+}
+
+/* Linhas da tabela */
+.habito-row {
+  transition: background-color 0.2s;
+}
+
+.habito-row:hover {
+  background-color: #f8f9fa;
+}
+
+.habito-row:not(:last-child) {
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Célula do nome do hábito */
+.habito-nome-cell {
+  padding: 12px 20px;
+}
+
+.habito-info strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #333;
+  font-size: 0.95em;
+}
+
+.habito-tags-mini {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.tag-badge-mini {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.7em;
+  font-weight: 500;
+  color: white;
+}
+
+/* Células dos dias */
+.dia-cell {
+  text-align: center;
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dia-cell:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.dia-status {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+/* Cores dos status dos dias */
+.dia-feito {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.dia-feito .dia-status {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.dia-hoje {
+  background-color: #fff3cd;
+  color: #856404;
+  font-weight: bold;
+}
+
+.dia-hoje .dia-status {
+  color: #fd7e14;
+}
+
+.dia-nao-feito {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.dia-nao-feito .dia-status {
+  color: #dc3545;
+}
+
+.dia-futuro {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.dia-nao-agendado {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  opacity: 0.5;
+}
+
+/* Célula de progresso */
+.progresso-cell {
+  padding: 12px;
+  text-align: center;
+}
+
+.progresso-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.progresso-mini .percentual {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.progresso-mini .detalhes {
+  font-size: 0.8em;
+  color: #6c757d;
+}
+
+/* Célula de ação */
+.acao-cell {
+  padding: 12px;
+  text-align: center;
+  white-space: nowrap;
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-edit-mini {
+  padding: 4px 10px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.8em;
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.btn-edit-mini:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+/* Legenda do grid */
+.grid-legenda {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.grid-legenda .legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85em;
+  color: #495057;
+}
+
+.cor-demo {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Botão secundário */
+.btn-secondary {
+  padding: 10px 20px;
+  background: #6c757d;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+}
+
+/* Botão de toggle período no grid */
+.btn-periodo-grid {
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-left: 15px;
+}
+
+.btn-periodo-grid:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+}
+
+/* Botão Ver mini */
+.btn-ver-mini {
+  padding: 4px 10px;
+  background: #17a2b8;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.8em;
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.btn-ver-mini:hover {
+  background: #138496;
+  transform: translateY(-1px);
+}
+
+/* Botão Excluir mini */
+.btn-excluir-mini {
+  padding: 4px 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8em;
+  transition: all 0.3s;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.btn-excluir-mini:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+/* Responsive para grid */
+@media (max-width: 1200px) {
+  .habitos-grid-table {
+    font-size: 0.8em;
+  }
+
+  .dia-col {
+    width: 28px;
+    min-width: 28px;
+  }
+
+  .habito-nome-col {
+    min-width: 150px;
+  }
+
+  .btn-periodo-grid {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .acao-cell {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .btn-ver-mini,
+  .btn-edit-mini,
+  .btn-excluir-mini {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ============================================
+   PÁGINA SHOW DO HÁBITO
+   ============================================ */
+
+/* Detalhes do hábito */
+.habito-detalhes {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.habito-detalhes .descricao {
+  font-size: 1.1em;
+  color: #495057;
+  margin-bottom: 15px;
+}
+
+.habito-meta-info {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-weight: 500;
+  background: #e9ecef;
+  color: #495057;
+}
+
+.badge-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-secondary {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.habito-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Calendário do mês na página show */
+.calendario-mensal {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 25px;
+}
+
+.calendario-mensal h3 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.3em;
+}
+
+.calendario-grid {
+  margin-bottom: 20px;
+}
+
+.calendario-dias {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.dia-semana-header {
+  text-align: center;
+  font-weight: 600;
+  color: #495057;
+  padding: 10px 0;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+
+.dia-calendario {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s;
+  position: relative;
+  min-height: 70px;
+}
+
+.dia-calendario .dia-numero {
+  font-weight: 600;
+  font-size: 1.1em;
+  margin-bottom: 4px;
+}
+
+.dia-calendario .dia-status {
+  font-size: 1.3em;
+}
+
+.dia-calendario .indicador-observacao {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 0.9em;
+}
+
+.dia-vazio {
+  aspect-ratio: 1;
+  min-height: 70px;
+}
+
+.com-observacao {
+  border: 2px solid #007bff;
+}
+
+/* Legenda do calendário */
+.calendario-legenda {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.calendario-legenda .legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9em;
+  color: #495057;
+}
+
+.calendario-legenda .indicador-observacao {
+  font-size: 1.2em;
+}
+
+/* Estatísticas do mês */
+.estatisticas-mes {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.estatistica {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.estatistica .label {
+  font-size: 0.9em;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.estatistica .valor {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #28a745;
+}
+
+/* Seção de comentários */
+.comentarios-section {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.comentarios-section h3 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.3em;
+}
+
+.comentario-dia {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.comentario-dia:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.comentario-data {
+  margin-bottom: 12px;
+  color: #495057;
+}
+
+.comentario-data strong {
+  font-size: 1.1em;
+  color: #333;
+}
+
+.comentario-data .dia-semana {
+  color: #6c757d;
+  font-size: 0.9em;
+  margin-left: 8px;
+}
+
+.comentario-conteudo {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.comentario-conteudo:last-child {
+  margin-bottom: 0;
+}
+
+.comentario-status {
+  margin-bottom: 10px;
+}
+
+.status-feito {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.status-nao-feito {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.comentario-texto {
+  color: #495057;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.empty-state p {
+  font-size: 1.1em;
+  margin: 0;
+}
+
+/* Responsive para página show */
+@media (max-width: 768px) {
+  .calendario-dias {
+    gap: 4px;
+  }
+
+  .dia-calendario {
+    min-height: 50px;
+    padding: 4px;
+  }
+
+  .dia-semana-header {
+    padding: 6px 0;
+    font-size: 0.75em;
+  }
+
+  .dia-calendario .dia-numero {
+    font-size: 0.9em;
+  }
+
+  .dia-calendario .dia-status {
+    font-size: 1em;
+  }
+
+  .estatisticas-mes {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .calendario-legenda {
+    gap: 10px;
+  }
+
+  .calendario-legenda .legenda-item {
+    font-size: 0.8em;
   }
 }

@@ -10,20 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_27_235457) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_04_234335) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
-  create_table "atividades", force: :cascade do |t|
+  create_table "habitos", force: :cascade do |t|
     t.boolean "ativo"
     t.datetime "created_at", null: false
     t.text "descricao"
     t.json "dias_semana", default: []
     t.integer "frequencia_semanal"
     t.string "nome"
-    t.bigint "objetivo_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["objetivo_id"], name: "index_atividades_on_objetivo_id"
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_habitos_on_user_id"
+  end
+
+  create_table "habitos_tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "habito_id", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["habito_id", "tag_id"], name: "index_habitos_tags_on_habito_id_and_tag_id", unique: true
+    t.index ["habito_id"], name: "index_habitos_tags_on_habito_id"
+    t.index ["tag_id"], name: "index_habitos_tags_on_tag_id"
   end
 
   create_table "objetivos", force: :cascade do |t|
@@ -37,13 +47,23 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_27_235457) do
   end
 
   create_table "registros", force: :cascade do |t|
-    t.bigint "atividade_id", null: false
     t.boolean "concluido"
     t.datetime "created_at", null: false
     t.date "data"
+    t.bigint "habito_id", null: false
     t.text "observacao"
     t.datetime "updated_at", null: false
-    t.index ["atividade_id"], name: "index_registros_on_atividade_id"
+    t.index ["habito_id"], name: "index_registros_on_habito_id"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "cor", default: "#6c757d"
+    t.datetime "created_at", null: false
+    t.string "nome", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "nome"], name: "index_tags_on_user_id_and_nome", unique: true
+    t.index ["user_id"], name: "index_tags_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -58,7 +78,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_27_235457) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
-  add_foreign_key "atividades", "objetivos"
+  add_foreign_key "habitos", "users"
+  add_foreign_key "habitos_tags", "habitos"
+  add_foreign_key "habitos_tags", "tags"
   add_foreign_key "objetivos", "users"
-  add_foreign_key "registros", "atividades"
+  add_foreign_key "registros", "habitos"
+  add_foreign_key "tags", "users"
 end

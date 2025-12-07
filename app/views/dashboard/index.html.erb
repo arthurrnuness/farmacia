@@ -1,71 +1,85 @@
 <!-- app/views/dashboard/index.html.erb -->
 <div class="container">
   <div class="header">
-    <h1>Meu Progresso</h1>
-    <%= link_to 'Novo Objetivo', new_objetivo_path, class: 'btn btn-primary' %>
+    <h1>Meus Hábitos</h1>
+    <div class="header-actions">
+      <button id="btn-ver-hoje" class="btn btn-ver-hoje">Ver Hoje</button>
+      <%= link_to 'Ver Grade', dashboard_grid_path(mes: @mes, ano: @ano), class: 'btn btn-secondary' %>
+      <%= link_to 'Novo Hábito', new_habito_path, class: 'btn btn-primary' %>
+    </div>
   </div>
-  
+
   <!-- Navegação de Meses -->
   <div class="mes-navegacao">
-    <%= link_to dashboard_path(mes: @mes == 1 ? 12 : @mes - 1, 
-                                ano: @mes == 1 ? @ano - 1 : @ano), 
+    <%= link_to dashboard_path(mes: @mes == 1 ? 12 : @mes - 1,
+                                ano: @mes == 1 ? @ano - 1 : @ano),
                 class: 'btn-nav' do %>
       ← Mês Anterior
     <% end %>
-    
+
     <h2 class="mes-atual">
       <%= I18n.t("date.month_names")[@mes] %> <%= @ano %>
     </h2>
-    
-    <%= link_to dashboard_path(mes: @mes == 12 ? 1 : @mes + 1, 
-                                ano: @mes == 12 ? @ano + 1 : @ano), 
+
+    <%= link_to dashboard_path(mes: @mes == 12 ? 1 : @mes + 1,
+                                ano: @mes == 12 ? @ano + 1 : @ano),
                 class: 'btn-nav' do %>
       Próximo Mês →
     <% end %>
-    
+
     <%= link_to 'Voltar para Hoje', dashboard_path, class: 'btn btn-hoje' %>
   </div>
-  
-  <% if @objetivos.empty? %>
+
+  <!-- Filtro de Tags -->
+  <% if current_user.tags.any? %>
+    <div class="tags-filter">
+      <button class="tag-filter active" data-tag-id="all">Todos</button>
+      <% current_user.tags.each do |tag| %>
+        <button class="tag-filter" data-tag-id="<%= tag.id %>" style="background-color: <%= tag.cor %>">
+          <%= tag.nome %>
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @habitos.empty? %>
     <div class="empty-state">
-      <p>Você ainda não tem objetivos cadastrados.</p>
-      <%= link_to 'Criar primeiro objetivo', new_objetivo_path, class: 'btn btn-primary' %>
+      <p>Você ainda não tem hábitos cadastrados.</p>
+      <%= link_to 'Criar primeiro hábito', new_habito_path, class: 'btn btn-primary' %>
     </div>
   <% else %>
-    <% @objetivos.each do |objetivo| %>
-      <div class="objetivo-card" style="border-left: 4px solid <%= objetivo || '#666' %>">
-        <div class="objetivo-header">
-          <h2><%= objetivo.nome %></h2>
-          <%= link_to 'Gerenciar', objetivo_path(objetivo), class: 'btn-link' %>
-        </div>
-        
-        <% if objetivo.descricao.present? %>
-          <p class="objetivo-descricao"><%= objetivo.descricao %></p>
-        <% end %>
-        
-        <!-- Atividades do objetivo -->
-        <% objetivo.atividades.where(ativo: true).each do |atividade| %>
-          <div class="atividade-section">
-            <h3 class="atividade-titulo"><%= atividade.nome %></h3>
-            
-            <div class="atividade-progresso-mes">
-              <% progresso_mes = calcular_progresso_mes(atividade, @mes, @ano) %>
-              
-              <div class="progresso-stats">
-                <span class="stat">
-                  <strong><%= progresso_mes[:feitos] %></strong> / <%= progresso_mes[:agendados] %> dias
-                </span>
-                <span class="stat percentual">
-                  <%= progresso_mes[:percentual] %>%
-                </span>
+    <% @habitos.each do |habito| %>
+      <div class="habito-card" data-tag-ids="<%= habito.tag_ids.join(',') %>">
+        <div class="habito-header">
+          <div class="habito-title-section">
+            <h2><%= habito.nome %></h2>
+            <% if habito.tags.any? %>
+              <div class="habito-tags">
+                <% habito.tags.each do |tag| %>
+                  <span class="tag-badge" style="background-color: <%= tag.cor %>"><%= tag.nome %></span>
+                <% end %>
               </div>
-            </div>
-            
-            <!-- CALENDÁRIO DA ATIVIDADE -->
-            <%= render partial: 'atividades/calendario_mensal', 
-                       locals: { atividade: atividade, mes: @mes, ano: @ano } %>
+            <% end %>
+            <% if habito.descricao.present? %>
+              <p class="habito-descricao"><%= habito.descricao %></p>
+            <% end %>
           </div>
-        <% end %>
+
+          <div class="habito-progresso-side">
+            <% progresso_mes = calcular_progresso_mes(habito, @mes, @ano) %>
+            <div class="progresso-percentual">
+              <%= progresso_mes[:percentual] %>%
+            </div>
+            <div class="progresso-detalhes">
+              <strong><%= progresso_mes[:feitos] %></strong> / <%= progresso_mes[:agendados] %> dias
+            </div>
+            <%= link_to 'Editar', edit_habito_path(habito), class: 'btn-link-editar' %>
+          </div>
+        </div>
+
+        <!-- CALENDÁRIO DO HÁBITO -->
+        <%= render partial: 'habitos/calendario_mensal',
+                   locals: { habito: habito, mes: @mes, ano: @ano } %>
       </div>
     <% end %>
   <% end %>

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if exist habitos rmdir /s /q habitos)",
+      "Bash(xcopy:*)",
+      "Bash(rails db:migrate:*)",
+      "Bash(timeout 10 rails:*)",
+      "Bash(rails generate:*)",
+      "Bash(rails console:*)",
+      "Bash(dir:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell -Command \"(Get-Content ''c:\\Users\\arthu\\Documents\\ruby\\farmacia\\app\\assets\\stylesheets\\dashboard.css'' | Measure-Object -Line).Lines\")",
+      "Bash(bundle install:*)",
+      "Bash(del \"c:\\Users\\arthu\\Documents\\ruby\\farmacia\\app\\controllers\\payments_controller.rb\")",
+      "Bash(timeout /t 3)",
+      "Bash(rails routes:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(bundle show:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

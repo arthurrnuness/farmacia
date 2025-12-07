@@ -1,0 +1,506 @@
+/* app/assets/stylesheets/dashboard.css */
+
+/* Calendário da atividade */
+.calendario-atividade {
+  margin-top: 15px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.calendario-titulo {
+  font-size: 0.95em;
+  margin-bottom: 10px;
+  color: #495057;
+  text-align: center;
+}
+
+.calendario-grid-pequeno {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.dia-header-pequeno {
+  padding: 6px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.75em;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.dia-pequeno {
+  padding: 8px;
+  text-align: center;
+  font-size: 0.85em;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.dia-pequeno:hover {
+  transform: scale(1.1);
+}
+
+.dia-vazio-pequeno {
+  padding: 8px;
+}
+
+/* Cores dos dias */
+.dia-pequeno.feito {
+  background: #28a745;
+  color: white;
+}
+
+.dia-pequeno.hoje {
+  background: #fd7e14;
+  color: white;
+  font-weight: bold;
+  border: 2px solid #fd7e14;
+  box-shadow: 0 0 8px rgba(253, 126, 20, 0.5);
+}
+
+.dia-pequeno.futuro {
+  background: #ffc107;
+  color: #333;
+}
+
+.dia-pequeno.nao-feito {
+  background: #dc3545;
+  color: white;
+}
+
+.dia-pequeno.neutro {
+  background: #e9ecef;
+  color: #6c757d;
+}
+
+.dia-pequeno.nao-agendado {
+  background: #f8f9fa;
+  color: #adb5bd;
+  opacity: 0.6;
+}
+
+/* Legenda */
+.calendario-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8em;
+  color: #6c757d;
+}
+
+.cor-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.cor-box.feito {
+  background: #28a745;
+}
+
+.cor-box.hoje {
+  background: #fd7e14;
+}
+
+.cor-box.futuro {
+  background: #ffc107;
+}
+
+.cor-box.nao-feito {
+  background: #dc3545;
+}
+
+.cor-box.neutro {
+  background: #e9ecef;
+  border: 1px solid #ced4da;
+}
+
+.cor-box.nao-agendado {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .calendario-grid-pequeno {
+    gap: 2px;
+  }
+  
+  .dia-pequeno {
+    padding: 6px;
+    font-size: 0.75em;
+  }
+  
+  .calendario-legenda {
+    gap: 8px;
+  }
+  
+  .legenda-item {
+    font-size: 0.75em;
+  }
+  
+  .cor-box {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* app/assets/stylesheets/dashboard.css */
+
+.mes-navegacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 30px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.mes-atual {
+  margin: 0;
+  font-size: 1.8em;
+  color: #333;
+  text-align: center;
+  flex: 1;
+}
+
+.btn-nav {
+  padding: 12px 24px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-nav:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+}
+
+.btn-hoje {
+  padding: 10px 20px;
+  background: #28a745;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.9em;
+  margin-left: 15px;
+}
+
+.btn-hoje:hover {
+  background: #218838;
+}
+
+.atividade-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.atividade-titulo {
+  margin: 0 0 15px 0;
+  font-size: 1.2em;
+  color: #495057;
+}
+
+.atividade-progresso-mes {
+  margin-bottom: 15px;
+}
+
+.progresso-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+}
+
+.stat {
+  font-size: 1em;
+  color: #6c757d;
+}
+
+.stat.percentual {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.stat strong {
+  color: #007bff;
+  font-size: 1.2em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mes-navegacao {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .mes-atual {
+    order: -1;
+    font-size: 1.4em;
+  }
+  
+  .btn-nav {
+    width: 100%;
+  }
+  
+  .btn-hoje {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Vista Compacta do Calendário */
+
+.calendario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.calendario-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.calendario-acoes {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-periodo {
+  background: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.85em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.btn-periodo:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.btn-expandir {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1.2em;
+}
+
+.btn-expandir:hover {
+  background: #e9ecef;
+  transform: scale(1.1);
+}
+
+/* Grid Compacto (horizontal scroll se necessário) */
+.calendario-compacto {
+  overflow-x: auto;
+  margin-bottom: 15px;
+}
+
+.calendario-grid-compacto {
+  display: flex;
+  gap: 8px;
+  padding: 5px;
+  min-width: min-content;
+}
+
+.dia-compacto-wrapper {
+  flex-shrink: 0;
+}
+
+.dia-compacto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 8px;
+  border-radius: 8px;
+  min-width: 50px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.dia-compacto:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.dia-numero-compacto {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.dia-semana-compacto {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.tem-nota-compacto {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 12px;
+}
+
+/* Cores dos dias compactos */
+.dia-compacto.feito {
+  background: #28a745;
+  color: white;
+}
+
+.dia-compacto.hoje {
+  background: #fd7e14;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 12px rgba(253, 126, 20, 0.6);
+}
+
+.dia-compacto.futuro {
+  background: #ffc107;
+  color: #333;
+}
+
+.dia-compacto.nao-feito {
+  background: #dc3545;
+  color: white;
+}
+
+.dia-compacto.neutro {
+  background: #e9ecef;
+  color: #6c757d;
+}
+
+.dia-compacto.nao-agendado {
+  background: #f8f9fa;
+  color: #adb5bd;
+  opacity: 0.6;
+}
+
+/* Vista Expandida */
+.calendario-expandido {
+  animation: expandir 0.3s ease-out;
+}
+
+@keyframes expandir {
+  from {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+.calendario-stats {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.stat-label {
+  font-size: 0.85em;
+  color: #6c757d;
+}
+
+.stat-valor {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* Responsive para vista compacta */
+@media (max-width: 768px) {
+  .calendario-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .calendario-acoes {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btn-periodo {
+    flex: 1;
+    padding: 10px;
+  }
+
+  .calendario-grid-compacto {
+    gap: 6px;
+  }
+
+  .dia-compacto {
+    min-width: 45px;
+    padding: 8px 6px;
+  }
+
+  .dia-numero-compacto {
+    font-size: 1.1em;
+  }
+
+  .dia-semana-compacto {
+    font-size: 0.7em;
+  }
+}

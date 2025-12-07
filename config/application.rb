@@ -18,6 +18,9 @@ module Farmacia
 
     config.active_job.queue_adapter = :sidekiq
 
+    # Force UTF-8 encoding
+    config.encoding = "utf-8"
+
 
     # Configuration for the application, engines, and railties goes here.
     #

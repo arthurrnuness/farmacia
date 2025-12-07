@@ -72,3 +72,6 @@ gem 'whenever', require: false
 gem 'rufus-scheduler'
 
 gem 'devise'
+gem 'stripe'
+
+gem 'dotenv-rails', groups: [:development, :test]

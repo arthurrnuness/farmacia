@@ -2,36 +2,36 @@
 class RegistrosController < ApplicationController
   before_action :authenticate_user!
   before_action :set_registro, only: [:edit, :update]
-  before_action :set_atividade_para_novo, only: [:new]
-  
+  before_action :set_habito_para_novo, only: [:new]
+
   def new
-    @registro = @atividade.registros.build
+    @registro = @habito.registros.build
     @registro.data = params[:data] ? Date.parse(params[:data]) : Date.today
     @registro.concluido = false
   end
-  
+
   def create
-    atividade_id = registro_params[:atividade_id] || params[:atividade_id]
-    @atividade = Atividade.find(atividade_id)
-    
-    unless @atividade.objetivo.user == current_user
+    habito_id = registro_params[:habito_id] || params[:habito_id]
+    @habito = Habito.find(habito_id)
+
+    unless @habito.user == current_user
       redirect_to root_path, alert: 'Acesso negado'
       return
     end
-    
-    @registro = @atividade.registros.build(registro_params.except(:atividade_id))
-    
+
+    @registro = @habito.registros.build(registro_params.except(:habito_id))
+
     if @registro.save
       redirect_to dashboard_path, notice: '✅ Registro criado!'
     else
       render :new, status: :unprocessable_entity
     end
   end
-  
+
   def edit
     # @registro já definido
   end
-  
+
   def update
     if @registro.update(registro_params)
       redirect_to dashboard_path, notice: '✅ Atualizado!'
@@ -39,50 +39,81 @@ class RegistrosController < ApplicationController
       render :edit, status: :unprocessable_entity
     end
   end
-  
+
   def toggle
-    @atividade = Atividade.find(params[:atividade_id])
-    
-    unless @atividade.objetivo.user == current_user
-      redirect_to root_path, alert: 'Acesso negado'
+    @habito = Habito.find(params[:habito_id])
+
+    unless @habito.user == current_user
+      respond_to do |format|
+        format.html { redirect_to root_path, alert: 'Acesso negado' }
+        format.json { render json: { success: false, error: 'Acesso negado' }, status: :forbidden }
+      end
       return
     end
-    
+
     data = params[:data] ? Date.parse(params[:data]) : Date.today
-    registro = @atividade.registros.find_by(data: data)
-    
+    registro = @habito.registros.find_by(data: data)
+
     if registro
       registro.update!(concluido: !registro.concluido)
-      message = registro.concluido? ? '✅ Marcado!' : '❌ Desmarcado'
+      concluido = registro.concluido?
+      message = concluido ? '✅ Marcado!' : '❌ Desmarcado'
     else
-      @atividade.registros.create!(data: data, concluido: true)
+      registro = @habito.registros.create!(data: data, concluido: true)
+      concluido = true
       message = '✅ Marcado!'
     end
-    
-    redirect_back fallback_location: dashboard_path, notice: message
+
+    respond_to do |format|
+      format.html { redirect_back fallback_location: dashboard_path, notice: message }
+      format.json { render json: { success: true, concluido: concluido, message: message } }
+    end
   end
-  
+
+  def editar_ou_criar
+    @habito = Habito.find(params[:habito_id])
+
+    unless @habito.user == current_user
+      render json: { success: false, error: 'Acesso negado' }, status: :forbidden
+      return
+    end
+
+    data = params[:data] ? Date.parse(params[:data]) : Date.today
+    registro = @habito.registros.find_by(data: data)
+
+    # Se não existe, criar um novo registro
+    unless registro
+      registro = @habito.registros.create!(
+        data: data,
+        concluido: false,
+        observacao: ''
+      )
+    end
+
+    render json: { success: true, registro_id: registro.id }
+  end
+
   private
-  
+
   def set_registro
     @registro = Registro.find(params[:id])
-    
-    unless @registro.atividade.objetivo.user == current_user
+
+    unless @registro.habito.user == current_user
       redirect_to root_path, alert: 'Acesso negado'
       return
     end
   end
-  
-  def set_atividade_para_novo
-    @atividade = Atividade.find(params[:atividade_id])
-    
-    unless @atividade.objetivo.user == current_user
+
+  def set_habito_para_novo
+    @habito = Habito.find(params[:habito_id])
+
+    unless @habito.user == current_user
       redirect_to root_path, alert: 'Acesso negado'
       return
     end
   end
-  
+
   def registro_params
-    params.require(:registro).permit(:data, :concluido, :observacao, :atividade_id)
+    params.require(:registro).permit(:data, :concluido, :observacao, :habito_id)
   end
 end

@@ -8,9 +8,9 @@ function toggleCalendario(calendarioId) {
   const iconeRecolher = calendario.querySelector('.icone-recolher');
   const periodoCompacto = calendario.querySelector('.periodo-compacto');
   const periodoExpandido = calendario.querySelector('.periodo-expandido');
-  
+
   const estaExpandido = expandido.style.display !== 'none';
-  
+
   if (estaExpandido) {
     // Recolher
     expandido.style.display = 'none';
@@ -27,5 +27,29 @@ function toggleCalendario(calendarioId) {
     iconeRecolher.style.display = 'inline';
     periodoCompacto.style.display = 'none';
     periodoExpandido.style.display = 'inline';
+  }
+}
+
+function togglePeriodo(calendarioId) {
+  const calendario = document.getElementById(calendarioId);
+  const vistaMensal = calendario.querySelector('.vista-mensal');
+  const vistaSemanal = calendario.querySelector('.vista-semanal');
+  const textoMes = calendario.querySelector('.texto-mes');
+  const textoSemana = calendario.querySelector('.texto-semana');
+
+  const estaMostrandoSemana = vistaSemanal.style.display !== 'none';
+
+  if (estaMostrandoSemana) {
+    // Mudar para vista mensal
+    vistaSemanal.style.display = 'none';
+    vistaMensal.style.display = 'flex';
+    textoSemana.style.display = 'none';
+    textoMes.style.display = 'inline';
+  } else {
+    // Mudar para vista semanal
+    vistaMensal.style.display = 'none';
+    vistaSemanal.style.display = 'flex';
+    textoMes.style.display = 'none';
+    textoSemana.style.display = 'inline';
   }
 }

@@ -1,10 +1,6 @@
 class Registro < ApplicationRecord
-  belongs_to :atividade 
-  
+  belongs_to :habito
+
   validates :data, presence: true
-
-  validates :atividade_id, uniqueness: { scope: :data, message: "já tem registro para este dia" }
-  
-
- 
+  validates :habito_id, uniqueness: { scope: :data, message: "já tem registro para este dia" }
 end

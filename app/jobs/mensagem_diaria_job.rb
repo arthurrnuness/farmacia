@@ -22,7 +22,23 @@ class MensagemDiariaJob < ApplicationJob
         delay: 0
       },
       textMessage: {
-        text: "Teste deu certo!"
+        text: "-regardless (anyway)
+        -matter of time
+        -interfere
+        -witness
+        -revere
+        -claim
+        -he says what's on his mind
+-practical, common sense, very logical
+-express some concern, wanna get something off my chest
+-i think most people generally, as a country
+-flourishing
+-spot on - perfect
+-we are working hand in hand with ice
+-wht do you make of that
+-let me give you my critique of what i would call
+-concerned
+-big fear"
       }
     }.to_json
     

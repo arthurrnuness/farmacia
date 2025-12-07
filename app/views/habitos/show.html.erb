@@ -1,0 +1,172 @@
+<!-- app/views/habitos/show.html.erb -->
+<div class="container">
+  <div class="header">
+    <h1><%= @habito.nome %></h1>
+    <div class="header-actions">
+      <%= link_to 'Voltar', dashboard_grid_path(mes: @mes, ano: @ano), class: 'btn btn-secondary' %>
+      <%= link_to 'Editar', edit_habito_path(@habito), class: 'btn btn-primary' %>
+    </div>
+  </div>
+
+  <!-- Informações do Hábito -->
+  <div class="habito-detalhes">
+    <% if @habito.descricao.present? %>
+      <p class="descricao"><%= @habito.descricao %></p>
+    <% end %>
+
+    <div class="habito-meta-info">
+      <span class="badge">Meta: <%= @habito.frequencia_semanal %>x por semana</span>
+      <span class="badge <%= @habito.ativo? ? 'badge-success' : 'badge-secondary' %>">
+        <%= @habito.ativo? ? 'Ativo' : 'Inativo' %>
+      </span>
+      <% if @habito.tags.any? %>
+        <div class="habito-tags">
+          <% @habito.tags.each do |tag| %>
+            <span class="tag-badge" style="background-color: <%= tag.cor %>">
+              <%= tag.nome %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Navegação de Meses -->
+  <div class="mes-navegacao">
+    <%= link_to habito_path(@habito, mes: @mes == 1 ? 12 : @mes - 1,
+                                ano: @mes == 1 ? @ano - 1 : @ano),
+                class: 'btn-nav' do %>
+      ← Mês Anterior
+    <% end %>
+
+    <h2 class="mes-atual">
+      <%= I18n.t("date.month_names")[@mes] %> <%= @ano %>
+    </h2>
+
+    <%= link_to habito_path(@habito, mes: @mes == 12 ? 1 : @mes + 1,
+                                ano: @mes == 12 ? @ano + 1 : @ano),
+                class: 'btn-nav' do %>
+      Próximo Mês →
+    <% end %>
+
+    <%= link_to 'Voltar para Hoje', habito_path(@habito), class: 'btn btn-hoje' %>
+  </div>
+
+  <!-- Calendário do Mês -->
+  <div class="calendario-mensal">
+    <h3>Histórico de Atingimento</h3>
+
+    <div class="calendario-grid">
+      <div class="calendario-dias">
+        <!-- Cabeçalho dos dias da semana -->
+        <% %w[Dom Seg Ter Qua Qui Sex Sáb].each do |dia| %>
+          <div class="dia-semana-header"><%= dia %></div>
+        <% end %>
+
+        <!-- Dias vazios no início -->
+        <% @data_inicio.wday.times do %>
+          <div class="dia-vazio"></div>
+        <% end %>
+
+        <!-- Dias do mês -->
+        <% @dias_mes.each do |dia| %>
+          <%
+            agendado = @habito.fazer_hoje?(dia)
+            feito = @habito.feito_no_dia?(dia)
+            hoje = dia == Date.today
+            futuro = dia > Date.today
+            tem_observacao = @registros_com_observacao.key?(dia)
+
+            css_class = if !agendado
+              'dia-nao-agendado'
+            elsif feito
+              'dia-feito'
+            elsif hoje
+              'dia-hoje'
+            elsif futuro
+              'dia-futuro'
+            else
+              'dia-nao-feito'
+            end
+          %>
+          <div class="dia-calendario <%= css_class %> <%= 'com-observacao' if tem_observacao %>"
+               title="<%= dia.strftime('%d/%m/%Y') %>">
+            <div class="dia-numero"><%= dia.day %></div>
+            <% if agendado && !futuro %>
+              <div class="dia-status">
+                <%= feito ? '✓' : '○' %>
+              </div>
+            <% end %>
+            <% if tem_observacao %>
+              <div class="indicador-observacao">💬</div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>  <!-- fecha calendario-dias -->
+    </div>  <!-- fecha calendario-grid -->
+
+    <!-- Legenda -->
+    <div class="calendario-legenda">
+      <div class="legenda-item"><span class="cor-demo dia-feito"></span> Feito</div>
+      <div class="legenda-item"><span class="cor-demo dia-hoje"></span> Hoje</div>
+      <div class="legenda-item"><span class="cor-demo dia-nao-feito"></span> Não feito</div>
+      <div class="legenda-item"><span class="cor-demo dia-futuro"></span> Futuro</div>
+      <div class="legenda-item"><span class="cor-demo dia-nao-agendado"></span> Não agendado</div>
+      <div class="legenda-item"><span class="indicador-observacao">💬</span> Com comentário</div>
+    </div>
+
+    <!-- Estatísticas do Mês -->
+    <%
+      total_agendados = @dias_mes.count { |d| @habito.fazer_hoje?(d) && d <= Date.today }
+      total_feitos = @registros_mes.where(concluido: true).count
+      percentual = total_agendados > 0 ? (total_feitos.to_f / total_agendados * 100).round : 0
+    %>
+    <div class="estatisticas-mes">
+      <div class="estatistica">
+        <span class="label">Feitos:</span>
+        <span class="valor"><%= total_feitos %></span>
+      </div>
+      <div class="estatistica">
+        <span class="label">Agendados:</span>
+        <span class="valor"><%= total_agendados %></span>
+      </div>
+      <div class="estatistica">
+        <span class="label">Percentual:</span>
+        <span class="valor"><%= percentual %>%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Comentários por Dia -->
+  <% if @registros_com_observacao.any? %>
+    <div class="comentarios-section">
+      <h3>Comentários do Mês</h3>
+
+      <% @registros_com_observacao.each do |data, registros| %>
+        <div class="comentario-dia">
+          <div class="comentario-data">
+            <strong><%= I18n.l(data, format: :long) %></strong>
+            <span class="dia-semana">(<%= I18n.t('date.day_names')[data.wday] %>)</span>
+          </div>
+
+          <% registros.each do |registro| %>
+            <div class="comentario-conteudo">
+              <div class="comentario-status">
+                <span class="<%= registro.concluido? ? 'status-feito' : 'status-nao-feito' %>">
+                  <%= registro.concluido? ? '✓ Concluído' : '○ Não concluído' %>
+                </span>
+              </div>
+              <div class="comentario-texto">
+                <%= simple_format(registro.observacao) %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <p>Nenhum comentário registrado neste mês.</p>
+    </div>
+  <% end %>
+</div>
