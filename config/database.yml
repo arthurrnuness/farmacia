@@ -88,19 +88,11 @@ test:
 #
 production:
   primary: &primary_production
-    <<: *default
+    adapter: postgresql
+    encoding: unicode
     database: farmacia_production
-    username: farmacia
-    password: <%= ENV["FARMACIA_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: farmacia_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: farmacia_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: farmacia_production_cable
-    migrations_paths: db/cable_migrate
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    username: postgres
+    password: postgres
+    host: postgres  # ← THIS IS THE KEY!
+    port: 5432

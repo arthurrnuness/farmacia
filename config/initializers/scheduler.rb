@@ -21,4 +21,3 @@ end
 #scheduler.in '30s' do
 #  Rails.logger.info "Verificando registros pendentes - #{Time.now}"
 #  CriarRegistrosMensaisJob.perform_later(Date.today.month, Date.today.year)
-#end 
