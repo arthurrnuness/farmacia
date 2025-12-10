@@ -34,3 +34,5 @@
 /config/*.key
 
 /config/puma.rb
+
+/config/database.yml
