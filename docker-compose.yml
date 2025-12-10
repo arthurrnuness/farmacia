@@ -5,12 +5,12 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: 2019.plA
       POSTGRES_DB: farmacia_production
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    #ports:
+    #  - "5432:5432"
     networks:
       - app_network
     healthcheck:
@@ -46,7 +46,7 @@ services:
       - "3000"
     environment:
       RAILS_ENV: production
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/farmacia_production
+      DATABASE_URL: postgresql://postgres:2019.plA@postgres:5432/farmacia_production
       REDIS_URL: redis://redis:6379/0
       DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
@@ -77,7 +77,7 @@ services:
       AUTHENTICATION_API_KEY: "teste1234"
       DATABASE_ENABLED: "true"
       DATABASE_PROVIDER: postgresql
-      DATABASE_CONNECTION_URI: postgresql://postgres:postgres@postgres:5432/evolution_db
+      DATABASE_CONNECTION_URI: postgresql://postgres:2019.plA@postgres:5432/evolution_db
       REDIS_ENABLED: "true"
       REDIS_URI: redis://redis:6379
       # Adicione suas outras variáveis de ambiente aqui
