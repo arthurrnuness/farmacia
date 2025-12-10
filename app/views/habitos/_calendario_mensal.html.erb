@@ -53,12 +53,12 @@
 
           if registro.nil?
             cor_classe = dia_agendado ? 'neutro' : 'nao-agendado'
+          elsif registro.concluido?
+            cor_classe = 'feito'
           elsif dia == hoje
             cor_classe = 'hoje'
           elsif dia > hoje
             cor_classe = 'futuro'
-          elsif registro.concluido?
-            cor_classe = 'feito'
           else
             cor_classe = 'nao-feito'
           end
@@ -87,12 +87,12 @@
 
           if registro.nil?
             cor_classe = dia_agendado ? 'neutro' : 'nao-agendado'
+          elsif registro.concluido?
+            cor_classe = 'feito'
           elsif dia == hoje
             cor_classe = 'hoje'
           elsif dia > hoje
             cor_classe = 'futuro'
-          elsif registro.concluido?
-            cor_classe = 'feito'
           else
             cor_classe = 'nao-feito'
           end
@@ -134,12 +134,12 @@
 
           if registro.nil?
             cor_classe = dia_agendado ? 'neutro' : 'nao-agendado'
+          elsif registro.concluido?
+            cor_classe = 'feito'
           elsif dia == hoje
             cor_classe = 'hoje'
           elsif dia > hoje
             cor_classe = 'futuro'
-          elsif registro.concluido?
-            cor_classe = 'feito'
           else
             cor_classe = 'nao-feito'
           end
