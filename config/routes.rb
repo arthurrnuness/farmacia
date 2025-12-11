@@ -2,6 +2,11 @@ require 'sidekiq/web'
 Rails.application.routes.draw do
   devise_for :users
 
+  # Settings routes
+  get 'settings', to: 'settings#index', as: 'settings'
+  get 'settings/export', to: 'settings#export', as: 'settings_export'
+  post 'settings/import', to: 'settings#import', as: 'settings_import'
+
   root 'dashboard#index'
 
   resources :habitos do

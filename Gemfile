@@ -74,4 +74,9 @@ gem 'rufus-scheduler'
 gem 'devise'
 gem 'stripe'
 
+# Excel export/import
+gem 'caxlsx'
+gem 'caxlsx_rails'
+gem 'roo'
+
 gem 'dotenv-rails', groups: [:development, :test]

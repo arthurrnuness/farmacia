@@ -1,0 +1,95 @@
+<div class="container" style="max-width: 800px; margin: 40px auto;">
+  <div class="header">
+    <h1>⚙️ Configurações</h1>
+    <%= link_to '← Voltar ao Dashboard', dashboard_path, class: 'btn btn-secondary' %>
+  </div>
+
+  <% if notice %>
+    <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin: 20px 0;">
+      <%= notice %>
+    </div>
+  <% end %>
+
+  <% if alert %>
+    <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin: 20px 0;">
+      <%= alert %>
+    </div>
+  <% end %>
+
+  <!-- Seção de Exportação -->
+  <div class="settings-section" style="background: white; border-radius: 12px; padding: 30px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h2 style="margin-top: 0; color: #333;">📥 Exportar Dados</h2>
+    <p style="color: #666; margin-bottom: 20px;">
+      Faça o download de todos os seus dados em formato Excel. O arquivo incluirá:
+    </p>
+    <ul style="color: #666; margin-bottom: 20px;">
+      <li>Todos os seus hábitos (nome, descrição, dias da semana, frequência, status ativo)</li>
+      <li>Todos os registros de progresso com datas e observações</li>
+      <li>Suas tags personalizadas com cores</li>
+      <li>Relações entre hábitos e tags</li>
+    </ul>
+    <%= link_to '📊 Baixar Backup (Excel)', settings_export_path,
+        class: 'btn btn-primary',
+        style: 'display: inline-block; padding: 12px 24px; background: #28a745; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;',
+        data: { turbo: false } %>
+  </div>
+
+  <!-- Seção de Importação -->
+  <div class="settings-section" style="background: white; border-radius: 12px; padding: 30px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h2 style="margin-top: 0; color: #333;">📤 Importar Dados</h2>
+
+    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+      <strong style="color: #856404;">⚠️ ATENÇÃO:</strong>
+      <p style="color: #856404; margin: 10px 0 0 0;">
+        A importação irá <strong>SUBSTITUIR</strong> todos os seus dados atuais.
+        Certifique-se de fazer um backup antes de importar!
+      </p>
+    </div>
+
+    <p style="color: #666; margin-bottom: 20px;">
+      Restaure seus dados a partir de um arquivo Excel exportado anteriormente:
+    </p>
+
+    <%= form_with url: settings_import_path, multipart: true, local: true do |f| %>
+      <div style="margin-bottom: 20px;">
+        <%= f.file_field :file,
+            accept: '.xlsx',
+            style: 'display: block; margin-bottom: 10px; padding: 10px; border: 2px dashed #ccc; border-radius: 8px; width: 100%;' %>
+        <small style="color: #999;">Apenas arquivos .xlsx são suportados</small>
+      </div>
+
+      <%= f.submit '📥 Importar Backup',
+          class: 'btn btn-danger',
+          style: 'padding: 12px 24px; background: #dc3545; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;',
+          data: { confirm: 'Tem certeza? Isso irá SUBSTITUIR todos os seus dados atuais!' } %>
+    <% end %>
+  </div>
+
+  <!-- Informações Adicionais -->
+  <div class="settings-section" style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin: 20px 0;">
+    <h3 style="margin-top: 0; color: #333; font-size: 18px;">ℹ️ Sobre os Backups</h3>
+    <ul style="color: #666; line-height: 1.8; margin: 0;">
+      <li>Os arquivos exportados são compatíveis com Excel, Google Sheets e LibreOffice</li>
+      <li>Você pode editar os dados no Excel antes de reimportar (cuidado com o formato!)</li>
+      <li>Recomendamos fazer backups regulares dos seus dados</li>
+      <li>Os IDs originais serão preservados para manter a integridade dos dados</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+  .settings-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+  }
+
+  .btn {
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+</style>
