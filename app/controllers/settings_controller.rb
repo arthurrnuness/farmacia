@@ -4,6 +4,31 @@ class SettingsController < ApplicationController
   def index
   end
 
+  def review
+    start_date = Date.parse(params[:start_date]) rescue (Date.today - 7.days)
+    end_date = Date.parse(params[:end_date]) rescue Date.today
+
+    # Buscar todos os registros do usuário no período
+    registros = Registro.joins(:habito)
+                       .where(habitos: { user_id: current_user.id })
+                       .where(data: start_date..end_date)
+                       .order(data: :desc)
+                       .includes(:habito)
+
+    # Formatar dados para JSON
+    registros_data = registros.map do |registro|
+      {
+        id: registro.id,
+        habito_nome: registro.habito.nome,
+        data: registro.data.strftime('%d/%m/%Y'),
+        concluido: registro.concluido,
+        observacao: registro.observacao
+      }
+    end
+
+    render json: { registros: registros_data }
+  end
+
   def export
     package = Axlsx::Package.new
     workbook = package.workbook
