@@ -1,0 +1,374 @@
+<style>
+.pricing-container {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 20px;
+}
+
+.pricing-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.pricing-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.pricing-header .trial-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.pricing-header p {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.pricing-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 40px 30px;
+  background: white;
+  position: relative;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.pricing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.pricing-card.featured {
+  border-color: #667eea;
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+}
+
+.pricing-card .badge {
+  position: absolute;
+  top: -15px;
+  right: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.plan-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.plan-price {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #667eea;
+  margin: 20px 0;
+}
+
+.plan-price .currency {
+  font-size: 1.5rem;
+  vertical-align: super;
+}
+
+.plan-price .period {
+  font-size: 1rem;
+  color: #666;
+  font-weight: normal;
+}
+
+.plan-savings {
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 30px 0;
+}
+
+.plan-features li {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+
+.plan-features li:last-child {
+  border-bottom: none;
+}
+
+.plan-features li::before {
+  content: "✓";
+  color: #4caf50;
+  font-weight: bold;
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.plan-features.free li.limited::before {
+  content: "⚠";
+  color: #ff9800;
+}
+
+.plan-features.free li.not-included {
+  opacity: 0.4;
+}
+
+.plan-features.free li.not-included::before {
+  content: "✗";
+  color: #f44336;
+}
+
+.btn-subscribe {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 20px;
+}
+
+.btn-subscribe.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-subscribe.btn-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-subscribe.btn-current {
+  background: #f5f5f5;
+  color: #999;
+  cursor: default;
+}
+
+.comparison-table {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  margin-top: 50px;
+}
+
+.comparison-table h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.back-link a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+.status-banner {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  color: #856404;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.status-banner.trial {
+  background: #e3f2fd;
+  border-color: #2196f3;
+  color: #0d47a1;
+}
+
+.status-banner.premium {
+  background: #e8f5e9;
+  border-color: #4caf50;
+  color: #1b5e20;
+}
+</style>
+
+<div class="pricing-container">
+  <div class="pricing-header">
+    <h1>Escolha seu Plano</h1>
+    <div class="trial-badge">🎉 7 dias de trial gratuito para novos usuários</div>
+    <p>Transforme seus hábitos com o plano que funciona para você</p>
+  </div>
+
+  <% if current_user.on_trial? %>
+    <div class="status-banner trial">
+      <strong>Trial ativo!</strong> Você tem <%= current_user.trial_days_remaining %> <%= current_user.trial_days_remaining == 1 ? 'dia' : 'dias' %> restantes de acesso premium gratuito.
+    </div>
+  <% elsif current_user.premium? %>
+    <div class="status-banner premium">
+      <strong>Você é Premium!</strong> Obrigado por apoiar o desenvolvimento do app.
+      <%= link_to 'Gerenciar assinatura', payments_portal_path, style: 'color: #1b5e20; text-decoration: underline; margin-left: 10px;' %>
+    </div>
+  <% elsif current_user.habitos.count >= 4 %>
+    <div class="status-banner">
+      <strong>Limite atingido!</strong> Você está usando <%= current_user.habitos.count %>/4 hábitos disponíveis no plano gratuito.
+      Faça upgrade para criar hábitos ilimitados!
+    </div>
+  <% end %>
+
+  <div class="pricing-grid">
+    <!-- FREE Plan -->
+    <div class="pricing-card">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">
+        <span class="currency">R$</span>0
+        <span class="period">/mês</span>
+      </div>
+
+      <ul class="plan-features free">
+        <li class="limited">Até 4 hábitos</li>
+        <li>Calendário de hábitos</li>
+        <li>Estatísticas básicas</li>
+        <li>Registro de observações</li>
+        <li class="not-included">Hábitos ilimitados</li>
+        <li class="not-included">Estatísticas avançadas</li>
+        <li class="not-included">Exportar dados</li>
+        <li class="not-included">Lembretes personalizados</li>
+        <li class="not-included">Suporte prioritário</li>
+      </ul>
+
+      <% if !current_user.premium? && !current_user.on_trial? %>
+        <button class="btn-subscribe btn-current">Plano Atual</button>
+      <% end %>
+    </div>
+
+    <!-- MONTHLY Plan -->
+    <div class="pricing-card">
+      <div class="plan-name">Premium Mensal</div>
+      <div class="plan-price">
+        <span class="currency">R$</span>19,90
+        <span class="period">/mês</span>
+      </div>
+
+      <ul class="plan-features">
+        <li>Hábitos ilimitados</li>
+        <li>Calendário de hábitos</li>
+        <li>Estatísticas avançadas</li>
+        <li>Registro de observações</li>
+        <li>Exportar dados (Excel)</li>
+        <li>Tags personalizadas</li>
+        <li>Revisão histórica</li>
+        <li>Lembretes personalizados</li>
+        <li>Suporte prioritário</li>
+      </ul>
+
+      <% if current_user.premium? %>
+        <%= link_to 'Gerenciar Assinatura', payments_portal_path, class: 'btn-subscribe btn-primary' %>
+      <% else %>
+        <%= form_with url: payments_checkout_path, method: :post, data: { turbo: false } do |form| %>
+          <%= hidden_field_tag :plan, 'monthly' %>
+          <%= form.submit "Assinar Mensal", class: 'btn-subscribe btn-primary' %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- YEARLY Plan -->
+    <div class="pricing-card featured">
+      <div class="badge">Melhor valor</div>
+      <div class="plan-name">Premium Anual</div>
+      <div class="plan-price">
+        <span class="currency">R$</span>189,90
+        <span class="period">/ano</span>
+      </div>
+      <div class="plan-savings">Economize R$ 48,90 (20% de desconto)</div>
+
+      <ul class="plan-features">
+        <li>Hábitos ilimitados</li>
+        <li>Calendário de hábitos</li>
+        <li>Estatísticas avançadas</li>
+        <li>Registro de observações</li>
+        <li>Exportar dados (Excel)</li>
+        <li>Tags personalizadas</li>
+        <li>Revisão histórica</li>
+        <li>Lembretes personalizados</li>
+        <li>Suporte prioritário</li>
+      </ul>
+
+      <% if current_user.premium? %>
+        <%= link_to 'Gerenciar Assinatura', payments_portal_path, class: 'btn-subscribe btn-primary' %>
+      <% else %>
+        <%= form_with url: payments_checkout_path, method: :post, data: { turbo: false } do |form| %>
+          <%= hidden_field_tag :plan, 'yearly' %>
+          <%= form.submit "Assinar Anual", class: 'btn-subscribe btn-primary' %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="comparison-table">
+    <h2>Por que Premium?</h2>
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">
+      Desbloqueie todo o potencial do rastreamento de hábitos com recursos avançados
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px;">
+      <div style="padding: 20px; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 10px;">📊</div>
+        <h3 style="margin-bottom: 10px;">Estatísticas Avançadas</h3>
+        <p style="color: #666;">Visualize padrões, streaks e tendências dos seus hábitos</p>
+      </div>
+
+      <div style="padding: 20px; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 10px;">📥</div>
+        <h3 style="margin-bottom: 10px;">Exportação de Dados</h3>
+        <p style="color: #666;">Baixe seus dados em Excel para análise personalizada</p>
+      </div>
+
+      <div style="padding: 20px; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🔔</div>
+        <h3 style="margin-bottom: 10px;">Lembretes Personalizados</h3>
+        <p style="color: #666;">Configure notificações para nunca esquecer seus hábitos</p>
+      </div>
+
+      <div style="padding: 20px; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🎯</div>
+        <h3 style="margin-bottom: 10px;">Sem Limites</h3>
+        <p style="color: #666;">Crie quantos hábitos você precisar para alcançar seus objetivos</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="back-link">
+    <%= link_to "← Voltar ao Dashboard", dashboard_path %>
+  </div>
+</div>

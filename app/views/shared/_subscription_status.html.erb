@@ -1,0 +1,158 @@
+<style>
+.subscription-status {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.subscription-status.free {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.subscription-status.trial {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.status-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.status-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.status-details {
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+
+.status-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-status {
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s;
+  display: inline-block;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-upgrade {
+  background: white;
+  color: #667eea;
+}
+
+.btn-upgrade:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-manage {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-manage:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.warning-icon {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+</style>
+
+<div class="subscription-status <%= current_user.premium? && !current_user.on_trial? ? 'premium' : (current_user.on_trial? ? 'trial' : 'free') %>">
+  <div class="status-content">
+    <div class="status-info">
+      <% if current_user.premium? && !current_user.on_trial? %>
+        <!-- Premium pago -->
+        <div class="status-badge">
+          <span>✨</span>
+          <span>Premium</span>
+        </div>
+        <div class="status-details">
+          Você tem acesso ilimitado a todos os recursos
+        </div>
+
+      <% elsif current_user.on_trial? %>
+        <!-- Trial ativo -->
+        <div class="status-badge">
+          <span>🎉</span>
+          <span>Trial Premium</span>
+        </div>
+        <div class="status-details">
+          <%= current_user.trial_days_remaining %> <%= current_user.trial_days_remaining == 1 ? 'dia' : 'dias' %> restantes de acesso premium gratuito
+          <% if current_user.trial_ending_soon? %>
+            <span class="warning-icon">⚠️</span>
+          <% end %>
+        </div>
+
+      <% else %>
+        <!-- Free -->
+        <div class="status-badge">
+          <span>📦</span>
+          <span>Plano Gratuito</span>
+        </div>
+        <div class="status-details">
+          Hábitos: <%= current_user.habitos.count %>/4
+          <% if current_user.habitos.count >= 4 %>
+            <span class="warning-icon">⚠️</span>
+            <strong>Limite atingido!</strong>
+          <% else %>
+            (você pode criar mais <%= current_user.habitos_remaining %>)
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="status-actions">
+      <% if current_user.premium? && !current_user.on_trial? %>
+        <!-- Botão para gerenciar assinatura -->
+        <%= link_to payments_portal_path, class: 'btn-status btn-manage' do %>
+          ⚙️ Gerenciar Assinatura
+        <% end %>
+
+      <% elsif current_user.on_trial? %>
+        <!-- Botão para upgrade durante trial -->
+        <%= link_to pricing_path, class: 'btn-status btn-upgrade' do %>
+          ⚡ Fazer Upgrade Agora
+        <% end %>
+
+      <% else %>
+        <!-- Botão para upgrade no plano free -->
+        <%= link_to pricing_path, class: 'btn-status btn-upgrade' do %>
+          ⚡ Upgrade para Premium
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

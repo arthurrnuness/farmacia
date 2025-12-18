@@ -1,52 +1,69 @@
 class PaymentsController < ApplicationController
   before_action :authenticate_user!
-  skip_before_action :verify_authenticity_token, only: [:webhook]
 
-  def new
+  # Página de pricing com planos disponíveis
+  def pricing
   end
 
-  def create_checkout_session
-    create_stripe_session
-  rescue Stripe::StripeError => e
-    Rails.logger.error "Stripe error: #{e.class} - #{e.message}"
-    flash[:error] = "Payment error"
-    redirect_to payments_new_path
-  rescue StandardError => e
-    Rails.logger.error "Error: #{e.class} - #{e.message}"
-    Rails.logger.error e.backtrace.join("\n")
-    flash[:error] = "System error"
-    redirect_to payments_new_path
-  end
+  # Criar sessão do Stripe Checkout com plano escolhido
+  def checkout
+    plan = params[:plan]
 
-  def success
-    flash[:notice] = 'Payment successful'
-    redirect_to dashboard_path
-  end
-
-  def cancel
-    flash[:alert] = 'Payment cancelled'
-    redirect_to dashboard_path
-  end
-
-  def webhook
-    payload = request.body.read
-    sig_header = request.env['HTTP_STRIPE_SIGNATURE']
-    endpoint_secret = ENV['STRIPE_WEBHOOK_SECRET']
-
-    begin
-      event = Stripe::Webhook.construct_event(payload, sig_header, endpoint_secret)
-    rescue JSON::ParserError, Stripe::SignatureVerificationError
-      render json: { error: 'Invalid' }, status: 400
+    unless ['monthly', 'yearly'].include?(plan)
+      flash[:error] = "Plano inválido"
+      redirect_to pricing_path
       return
     end
 
-    handle_stripe_event(event)
-    render json: { message: 'success' }, status: 200
+    create_stripe_session(plan)
+  rescue Stripe::StripeError => e
+    Rails.logger.error "Stripe error: #{e.class} - #{e.message}"
+    flash[:error] = "Erro no pagamento. Tente novamente."
+    redirect_to pricing_path
+  rescue StandardError => e
+    Rails.logger.error "Error: #{e.class} - #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    flash[:error] = "Erro no sistema. Tente novamente."
+    redirect_to pricing_path
+  end
+
+  # Retorno de pagamento bem-sucedido
+  def success
+    flash[:notice] = 'Pagamento realizado com sucesso! Bem-vindo ao Premium!'
+    redirect_to dashboard_path
+  end
+
+  # Retorno de pagamento cancelado
+  def cancel
+    flash[:alert] = 'Pagamento cancelado. Você pode tentar novamente quando quiser.'
+    redirect_to pricing_path
+  end
+
+  # Redirecionar para o Customer Portal do Stripe
+  def portal
+    # Criar sessão do Customer Portal
+    session = Stripe::BillingPortal::Session.create({
+      customer: current_user.stripe_customer_id,
+      return_url: dashboard_url
+    })
+
+    redirect_to session.url, allow_other_host: true
+  rescue Stripe::StripeError => e
+    Rails.logger.error "Stripe error: #{e.class} - #{e.message}"
+    flash[:error] = "Erro ao acessar portal. Tente novamente."
+    redirect_to dashboard_path
   end
 
   private
 
-  def create_stripe_session
+  def create_stripe_session(plan)
+    # Definir valores baseados no plano escolhido
+    plan_config = if plan == 'monthly'
+      { amount: 1990, interval: 'month', name: 'Premium Mensal' }
+    else
+      { amount: 18990, interval: 'year', name: 'Premium Anual' }
+    end
+
     # Force binary encoding for Windows compatibility
     Encoding.default_external = Encoding::UTF_8
     Encoding.default_internal = Encoding::UTF_8
@@ -54,11 +71,27 @@ class PaymentsController < ApplicationController
     params_hash = {
       customer_email: sanitize_string(current_user.email),
       payment_method_types: ['card'],
-      line_items: build_line_items,
-      mode: 'payment',
-      success_url: sanitize_string(build_success_url),
-      cancel_url: sanitize_string(build_cancel_url),
-      metadata: { user_id: current_user.id.to_s }
+      line_items: [{
+        price_data: {
+          currency: 'brl',
+          product_data: {
+            name: sanitize_string(plan_config[:name]),
+            description: sanitize_string("Assinatura #{plan_config[:name]} - Hábitos ilimitados e recursos avançados")
+          },
+          unit_amount: plan_config[:amount],
+          recurring: {
+            interval: plan_config[:interval]
+          }
+        },
+        quantity: 1
+      }],
+      mode: 'subscription',
+      success_url: sanitize_string(payments_success_url),
+      cancel_url: sanitize_string(payments_cancel_url),
+      metadata: {
+        user_id: current_user.id.to_s,
+        plan: plan
+      }
     }
 
     session = Stripe::Checkout::Session.create(params_hash)
@@ -67,45 +100,5 @@ class PaymentsController < ApplicationController
 
   def sanitize_string(str)
     str.to_s.force_encoding('UTF-8').encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
-  end
-
-  def build_line_items
-    [{
-      price_data: {
-        currency: 'brl',
-        product_data: {
-          name: 'Premium'.encode('UTF-8'),
-          description: 'Premium subscription'.encode('UTF-8')
-        },
-        unit_amount: 2999
-      },
-      quantity: 1
-    }]
-  end
-
-  def build_success_url
-    url = dashboard_url
-    "#{url}?payment=success"
-  end
-
-  def build_cancel_url
-    url = payments_new_url
-    "#{url}?payment=cancelled"
-  end
-
-  def handle_stripe_event(event)
-    case event.type
-    when 'checkout.session.completed'
-      handle_successful_payment(event.data.object)
-    when 'payment_intent.succeeded'
-      Rails.logger.info "Payment succeeded"
-    when 'payment_intent.payment_failed'
-      Rails.logger.error "Payment failed"
-    end
-  end
-
-  def handle_successful_payment(session)
-    user = User.find_by(id: session.metadata.user_id)
-    Rails.logger.info "Payment successful for user ID: #{user.id}" if user
   end
 end

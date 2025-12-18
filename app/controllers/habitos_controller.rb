@@ -1,6 +1,7 @@
 class HabitosController < ApplicationController
   before_action :authenticate_user!
   before_action :set_habito, only: %i[ show edit update destroy progresso estatisticas ]
+  before_action :check_habito_limit, only: %i[ new create ]
 
   # GET /habitos
   def index
@@ -124,6 +125,14 @@ class HabitosController < ApplicationController
           t.cor = params[:habito][:new_tag_cor].presence || Tag::CORES_PADRAO.sample
         end
         @habito.tags << tag unless @habito.tags.include?(tag)
+      end
+    end
+
+    # Verificar se o usuário pode criar mais hábitos
+    def check_habito_limit
+      unless current_user.can_create_habito?
+        flash[:alert] = "Você atingiu o limite de 4 hábitos no plano gratuito. Faça upgrade para Premium e tenha hábitos ilimitados!"
+        redirect_to pricing_path
       end
     end
 end

@@ -29,11 +29,14 @@ Rails.application.routes.draw do
   post 'registros/editar_ou_criar', to: 'registros#editar_ou_criar'
 
   # Payment routes
-  get 'payments/new', to: 'payments#new', as: 'payments_new'
-  post 'payments/create-checkout-session', to: 'payments#create_checkout_session', as: 'create_checkout_session'
+  get 'pricing', to: 'payments#pricing', as: 'pricing'
+  post 'payments/checkout', to: 'payments#checkout', as: 'payments_checkout'
   get 'payments/success', to: 'payments#success', as: 'payments_success'
   get 'payments/cancel', to: 'payments#cancel', as: 'payments_cancel'
-  post 'payments/webhook', to: 'payments#webhook'
+  get 'payments/portal', to: 'payments#portal', as: 'payments_portal'
+
+  # Webhook routes
+  post 'webhooks/stripe', to: 'webhooks#stripe'
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
