@@ -1,0 +1,312 @@
+<div class="container" style="max-width: 1200px; margin: 40px auto;">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h1>📅 Review de Registros</h1>
+    <%= link_to '← Voltar ao Dashboard', dashboard_path, class: 'btn btn-secondary' %>
+  </div>
+
+  <p style="color: #666; margin-bottom: 30px; font-size: 16px;">
+    Visualize todos os registros de hábitos executados em um período específico.
+  </p>
+
+  <!-- Filtros de Data -->
+  <div style="background: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h2 style="margin-top: 0; color: #333; margin-bottom: 20px;">🔍 Filtrar Período</h2>
+    <form id="review-filter-form">
+      <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: end;">
+        <div>
+          <label style="display: block; color: #333; font-weight: bold; margin-bottom: 8px;">
+            📆 Data Inicial
+          </label>
+          <input type="date" id="start-date" name="start_date"
+                 value="<%= (Date.today - 7.days).strftime('%Y-%m-%d') %>"
+                 style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px;">
+        </div>
+        <div>
+          <label style="display: block; color: #333; font-weight: bold; margin-bottom: 8px;">
+            📆 Data Final
+          </label>
+          <input type="date" id="end-date" name="end_date"
+                 value="<%= Date.today.strftime('%Y-%m-%d') %>"
+                 style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px;">
+        </div>
+        <div>
+          <button type="submit"
+                  style="padding: 12px 30px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 15px;">
+            🔍 Filtrar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Área de Resultados -->
+  <div id="review-results">
+    <div style="background: white; padding: 60px; border-radius: 12px; text-align: center; color: #999; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <div style="font-size: 64px; margin-bottom: 15px;">📊</div>
+      <div style="font-size: 18px;">Selecione um período e clique em "Filtrar" para ver os registros</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  .registro-item {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 5px solid #28a745;
+    transition: all 0.3s ease;
+  }
+
+  .registro-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .registro-item.nao-concluido {
+    border-left-color: #dc3545;
+    opacity: 0.8;
+  }
+
+  .registro-date {
+    font-weight: bold;
+    color: #333;
+    margin: 30px 0 15px 0;
+    font-size: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+  }
+
+  .habito-nome {
+    color: #007bff;
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: 16px;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: bold;
+  }
+
+  .status-concluido {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .status-nao-concluido {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .observacao {
+    color: #555;
+    margin-top: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    border-left: 3px solid #007bff;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.6;
+  }
+
+  .summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  }
+
+  .stat-card.success {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+  }
+
+  .stat-card.danger {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  }
+
+  .stat-number {
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 15px;
+    opacity: 0.95;
+  }
+
+  .results-container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('review-filter-form');
+  const resultsDiv = document.getElementById('review-results');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+
+    if (!startDate || !endDate) {
+      alert('Por favor, selecione as datas inicial e final');
+      return;
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+      alert('A data inicial não pode ser maior que a data final');
+      return;
+    }
+
+    // Mostrar loading
+    resultsDiv.innerHTML = `
+      <div style="background: white; padding: 60px; border-radius: 12px; text-align: center; color: #666; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="font-size: 64px; margin-bottom: 15px;">⏳</div>
+        <div style="font-size: 18px;">Carregando registros...</div>
+      </div>
+    `;
+
+    // Fazer requisição AJAX
+    fetch(`/review/data?start_date=${startDate}&end_date=${endDate}`, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.registros.length === 0) {
+        resultsDiv.innerHTML = `
+          <div style="background: white; padding: 60px; border-radius: 12px; text-align: center; color: #999; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="font-size: 64px; margin-bottom: 15px;">📭</div>
+            <div style="font-size: 18px;">Nenhum registro encontrado neste período</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Calcular estatísticas
+      const totalRegistros = data.registros.length;
+      const concluidos = data.registros.filter(r => r.concluido).length;
+      const naoConcluidos = totalRegistros - concluidos;
+      const taxaSucesso = ((concluidos / totalRegistros) * 100).toFixed(1);
+
+      let html = `
+        <div class="summary-stats">
+          <div class="stat-card">
+            <div class="stat-number">${totalRegistros}</div>
+            <div class="stat-label">Total de Registros</div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-number">${concluidos}</div>
+            <div class="stat-label">Concluídos (${taxaSucesso}%)</div>
+          </div>
+          <div class="stat-card danger">
+            <div class="stat-number">${naoConcluidos}</div>
+            <div class="stat-label">Não Concluídos</div>
+          </div>
+        </div>
+
+        <div class="results-container">
+          <h3 style="color: #333; margin-top: 0; margin-bottom: 20px; font-size: 20px;">📝 Detalhes dos Registros</h3>
+      `;
+
+      // Agrupar por data
+      const registrosPorData = {};
+      data.registros.forEach(registro => {
+        if (!registrosPorData[registro.data]) {
+          registrosPorData[registro.data] = [];
+        }
+        registrosPorData[registro.data].push(registro);
+      });
+
+      // Ordenar datas (mais recente primeiro)
+      const datasOrdenadas = Object.keys(registrosPorData).sort().reverse();
+
+      datasOrdenadas.forEach(data => {
+        html += `<div class="registro-date">📅 ${data}</div>`;
+
+        registrosPorData[data].forEach(registro => {
+          const concluido = registro.concluido;
+          const itemClass = concluido ? 'registro-item' : 'registro-item nao-concluido';
+          const statusClass = concluido ? 'status-badge status-concluido' : 'status-badge status-nao-concluido';
+          const statusText = concluido ? '✅ Concluído' : '❌ Não Concluído';
+
+          // Escapar HTML na observação para prevenir XSS
+          const observacaoEscaped = registro.observacao ?
+            registro.observacao.replace(/&/g, '&amp;')
+                              .replace(/</g, '&lt;')
+                              .replace(/>/g, '&gt;')
+                              .replace(/"/g, '&quot;')
+                              .replace(/'/g, '&#039;') : '';
+
+          html += `
+            <div class="${itemClass}">
+              <div>
+                <span class="habito-nome">${registro.habito_nome}</span>
+                <span class="${statusClass}">${statusText}</span>
+              </div>
+              ${observacaoEscaped ? `<div class="observacao">${observacaoEscaped}</div>` : ''}
+            </div>
+          `;
+        });
+      });
+
+      html += '</div>';
+      resultsDiv.innerHTML = html;
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      resultsDiv.innerHTML = `
+        <div style="background: white; padding: 60px; border-radius: 12px; text-align: center; color: #dc3545; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size: 64px; margin-bottom: 15px;">⚠️</div>
+          <div style="font-size: 18px;">Erro ao carregar registros. Tente novamente.</div>
+        </div>
+      `;
+    });
+  });
+});
+</script>

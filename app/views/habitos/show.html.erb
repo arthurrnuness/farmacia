@@ -4,6 +4,7 @@
     <h1><%= @habito.nome %></h1>
     <div class="header-actions">
       <%= link_to 'Voltar', dashboard_grid_path(mes: @mes, ano: @ano), class: 'btn btn-secondary' %>
+      <%= link_to '📊 Estatísticas', estatisticas_habito_path(@habito), class: 'btn btn-secondary' %>
       <%= link_to 'Editar', edit_habito_path(@habito), class: 'btn btn-primary' %>
     </div>
   </div>

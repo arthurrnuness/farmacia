@@ -4,6 +4,10 @@ class SettingsController < ApplicationController
   def index
   end
 
+  def review_page
+    render 'settings/review'
+  end
+
   def review
     start_date = Date.parse(params[:start_date]) rescue (Date.today - 7.days)
     end_date = Date.parse(params[:end_date]) rescue Date.today

@@ -1,0 +1,96 @@
+<% content_for :title, "habi.my - Transforme seus hábitos" %>
+
+<div class="landing-page">
+  <!-- Hero Section -->
+  <div class="landing-hero">
+    <div class="landing-container">
+      <div class="hero-content">
+        <div class="hero-logo">
+          <span class="logo-icon">📊</span>
+          <span class="logo-text">habi.my</span>
+        </div>
+
+        <h1 class="hero-title">Transforme seus hábitos,<br>transforme sua vida</h1>
+
+        <p class="hero-subtitle">
+          Acompanhe, analise e melhore seus hábitos diários com simplicidade e eficiência.
+          Construa a vida que você sempre quis, um dia de cada vez.
+        </p>
+
+        <div class="hero-actions">
+          <%= link_to 'Começar agora', new_user_registration_path, class: 'btn btn-hero-primary' %>
+          <%= link_to 'Já tenho conta', new_user_session_path, class: 'btn btn-hero-secondary' %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="landing-features">
+    <div class="landing-container">
+      <h2 class="section-title">Como o habi.my funciona</h2>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Crie seus hábitos</h3>
+          <p>Defina os hábitos que você quer desenvolver. Configure a frequência e acompanhe seu progresso.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📅</div>
+          <h3>Acompanhe diariamente</h3>
+          <p>Marque seus hábitos como concluídos todos os dias. Visualize seu calendário e veja seu progresso.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Analise estatísticas</h3>
+          <p>Veja gráficos e métricas detalhadas sobre seus hábitos. Entenda seus padrões e melhore continuamente.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔥</div>
+          <h3>Mantenha sequências</h3>
+          <p>Construa sequências de dias consecutivos. Quanto maior a sequência, mais forte o hábito.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🏷️</div>
+          <h3>Organize com tags</h3>
+          <p>Categorize seus hábitos com tags personalizadas. Filtre e visualize por categorias.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📝</div>
+          <h3>Adicione notas</h3>
+          <p>Registre observações e reflexões sobre seus dias. Acompanhe o contexto por trás dos números.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="landing-cta">
+    <div class="landing-container">
+      <h2>Pronto para começar?</h2>
+      <p>Junte-se a milhares de pessoas que estão transformando suas vidas através de melhores hábitos.</p>
+      <div class="cta-actions">
+        <%= link_to 'Criar conta gratuitamente', new_user_registration_path, class: 'btn btn-cta-primary' %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="landing-footer">
+    <div class="landing-container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <span class="logo-icon">📊</span>
+          <span class="logo-text">habi.my</span>
+        </div>
+        <p class="footer-text">© 2025 habi.my. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </div>
+</div>

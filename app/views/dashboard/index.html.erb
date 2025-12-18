@@ -1,12 +1,102 @@
 <!-- app/views/dashboard/index.html.erb -->
 <div class="container">
   <div class="header">
-    <h1>Meus Hábitos 4</h1>
+    <h1>Meus Hábitos</h1>
     <div class="header-actions">
       <button id="btn-ver-hoje" class="btn btn-ver-hoje">Ver Hoje</button>
       <%= link_to 'Ver Grade', dashboard_grid_path(mes: @mes, ano: @ano), class: 'btn btn-secondary' %>
       <%= link_to 'Novo Hábito', new_habito_path, class: 'btn btn-primary' %>
-      <%= link_to '⚙️ Configurações', settings_path, class: 'btn btn-secondary' %>
+    </div>
+  </div>
+
+  <!-- Daily Summary Stats -->
+  <%
+    # Calculate today's stats
+    hoje = Date.today
+    habitos_hoje = @habitos.select { |h| h.fazer_hoje?(hoje) }
+    habitos_feitos_hoje = habitos_hoje.select { |h| h.feito_no_dia?(hoje) }
+    percentual_hoje = habitos_hoje.any? ? ((habitos_feitos_hoje.count.to_f / habitos_hoje.count) * 100).round : 0
+
+    # Calculate month stats
+    inicio_mes = Date.new(@ano, @mes, 1)
+    fim_mes = inicio_mes.end_of_month
+    dias_mes = (inicio_mes..fim_mes).to_a
+
+    total_dias_agendados = 0
+    total_dias_completos = 0
+
+    dias_mes.each do |dia|
+      next if dia > hoje
+      habitos_dia = @habitos.select { |h| h.fazer_hoje?(dia) }
+      next if habitos_dia.empty?
+
+      total_dias_agendados += 1
+      habitos_feitos_dia = habitos_dia.select { |h| h.feito_no_dia?(dia) }
+      total_dias_completos += 1 if habitos_feitos_dia.count == habitos_dia.count
+    end
+
+    percentual_mes = total_dias_agendados > 0 ? ((total_dias_completos.to_f / total_dias_agendados) * 100).round : 0
+  %>
+
+  <div class="daily-summary">
+    <div class="summary-card">
+      <div class="summary-icon">📅</div>
+      <div class="summary-content">
+        <div class="summary-label">Hoje</div>
+        <div class="summary-value"><%= habitos_feitos_hoje.count %>/<%= habitos_hoje.count %></div>
+        <div class="summary-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: <%= percentual_hoje %>%"></div>
+          </div>
+          <span class="progress-text"><%= percentual_hoje %>%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon">📊</div>
+      <div class="summary-content">
+        <div class="summary-label">Este Mês</div>
+        <div class="summary-value"><%= total_dias_completos %>/<%= total_dias_agendados %> dias</div>
+        <div class="summary-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: <%= percentual_mes %>%"></div>
+          </div>
+          <span class="progress-text"><%= percentual_mes %>%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon">🎯</div>
+      <div class="summary-content">
+        <div class="summary-label">Hábitos Ativos</div>
+        <div class="summary-value"><%= @habitos.count %></div>
+        <div class="summary-subtitle"><%= habitos_hoje.count %> agendados hoje</div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon">🔥</div>
+      <div class="summary-content">
+        <div class="summary-label">Sequência</div>
+        <%
+          # Calculate longest current streak
+          max_streak = 0
+          @habitos.each do |habito|
+            streak = 0
+            data = hoje
+            while habito.fazer_hoje?(data) && habito.feito_no_dia?(data)
+              streak += 1
+              data -= 1.day
+              break if streak > 365 # Safety limit
+            end
+            max_streak = streak if streak > max_streak
+          end
+        %>
+        <div class="summary-value"><%= max_streak %> dias</div>
+        <div class="summary-subtitle">maior sequência ativa</div>
+      </div>
     </div>
   </div>
 
@@ -74,6 +164,7 @@
             <div class="progresso-detalhes">
               <strong><%= progresso_mes[:feitos] %></strong> / <%= progresso_mes[:agendados] %> dias
             </div>
+            <%= link_to '📊 Estatísticas', estatisticas_habito_path(habito), class: 'btn-link-editar', style: 'margin-right: 0.5rem;' %>
             <%= link_to 'Editar', edit_habito_path(habito), class: 'btn-link-editar' %>
           </div>
         </div>

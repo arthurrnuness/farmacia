@@ -1,0 +1,44 @@
+<% content_for :title, "Criar Conta - habi.my" %>
+
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <span class="logo-icon">📊</span>
+        <span class="logo-text">habi.my</span>
+      </div>
+      <h1>Criar sua conta</h1>
+      <p class="auth-subtitle">Comece a transformar seus hábitos hoje</p>
+    </div>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: 'auth-form' }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div class="form-group">
+        <%= f.label :email, "E-mail", class: 'form-label' %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'form-input', placeholder: 'seu@email.com' %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :password, "Senha", class: 'form-label' %>
+        <% if @minimum_password_length %>
+          <span class="form-hint">Mínimo de <%= @minimum_password_length %> caracteres</span>
+        <% end %>
+        <%= f.password_field :password, autocomplete: "new-password", class: 'form-input', placeholder: '••••••••' %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :password_confirmation, "Confirmar senha", class: 'form-label' %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: 'form-input', placeholder: '••••••••' %>
+      </div>
+
+      <div class="form-actions">
+        <%= f.submit "Criar conta", class: 'btn btn-primary btn-block' %>
+      </div>
+    <% end %>
+
+    <div class="auth-footer">
+      <p>Já tem uma conta? <%= link_to "Entrar", new_session_path(resource_name), class: 'link-primary' %></p>
+    </div>
+  </div>
+</div>

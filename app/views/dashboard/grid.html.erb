@@ -127,6 +127,7 @@
 
               <td class="acao-cell">
                 <%= link_to 'Ver', habito_path(habito), class: 'btn-ver-mini' %>
+                <%= link_to '📊', estatisticas_habito_path(habito), class: 'btn-ver-mini', title: 'Estatísticas' %>
                 <%= link_to 'Editar', edit_habito_path(habito), class: 'btn-edit-mini' %>
                 <%= button_to 'Excluir', habito_path(habito),
                     method: :delete,
@@ -213,6 +214,7 @@
 
               <td class="acao-cell">
                 <%= link_to 'Ver', habito_path(habito), class: 'btn-ver-mini' %>
+                <%= link_to '📊', estatisticas_habito_path(habito), class: 'btn-ver-mini', title: 'Estatísticas' %>
                 <%= link_to 'Editar', edit_habito_path(habito), class: 'btn-edit-mini' %>
                 <%= button_to 'Excluir', habito_path(habito),
                     method: :delete,

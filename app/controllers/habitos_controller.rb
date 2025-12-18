@@ -1,6 +1,6 @@
 class HabitosController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_habito, only: %i[ show edit update destroy progresso ]
+  before_action :set_habito, only: %i[ show edit update destroy progresso estatisticas ]
 
   # GET /habitos
   def index
@@ -86,6 +86,20 @@ class HabitosController < ApplicationController
         }
       end
     end
+  end
+
+  # GET /habitos/1/estatisticas
+  def estatisticas
+    # Mês e ano para as estatísticas (mês atual por padrão)
+    @mes = params[:mes] ? params[:mes].to_i : Date.today.month
+    @ano = params[:ano] ? params[:ano].to_i : Date.today.year
+
+    # Obter estatísticas do mês
+    @estatisticas = @habito.estatisticas_mes(@ano, @mes)
+
+    # Registros com observação do mês
+    @registros_com_observacao = @habito.dias_no_mes(@ano, @mes)
+                                       .where.not(observacao: [nil, ''])
   end
 
   private

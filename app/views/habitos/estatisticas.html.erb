@@ -1,0 +1,543 @@
+<!-- app/views/habitos/estatisticas.html.erb -->
+<div class="container">
+  <div class="header">
+    <h1>Estatísticas: <%= @habito.nome %></h1>
+    <div class="header-actions">
+      <%= link_to 'Voltar', habito_path(@habito, mes: @mes, ano: @ano), class: 'btn btn-secondary' %>
+      <%= link_to 'Dashboard', dashboard_path, class: 'btn btn-secondary' %>
+      <%= link_to 'Editar Hábito', edit_habito_path(@habito), class: 'btn btn-primary' %>
+    </div>
+  </div>
+
+  <!-- Informações do Hábito -->
+  <div class="habito-detalhes">
+    <% if @habito.descricao.present? %>
+      <p class="descricao"><%= @habito.descricao %></p>
+    <% end %>
+
+    <div class="habito-meta-info">
+      <span class="badge">Meta: <%= @habito.frequencia_semanal %>x por semana</span>
+      <span class="badge <%= @habito.ativo? ? 'badge-success' : 'badge-secondary' %>">
+        <%= @habito.ativo? ? 'Ativo' : 'Inativo' %>
+      </span>
+      <% if @habito.tags.any? %>
+        <div class="habito-tags">
+          <% @habito.tags.each do |tag| %>
+            <span class="tag-badge" style="background-color: <%= tag.cor %>">
+              <%= tag.nome %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Navegação de Meses -->
+  <div class="mes-navegacao">
+    <%= link_to estatisticas_habito_path(@habito, mes: @mes == 1 ? 12 : @mes - 1,
+                                ano: @mes == 1 ? @ano - 1 : @ano),
+                class: 'btn-nav' do %>
+      ← Mês Anterior
+    <% end %>
+
+    <h2 class="mes-atual">
+      <%= I18n.t("date.month_names")[@mes] %> <%= @ano %>
+    </h2>
+
+    <%= link_to estatisticas_habito_path(@habito, mes: @mes == 12 ? 1 : @mes + 1,
+                                ano: @mes == 12 ? @ano + 1 : @ano),
+                class: 'btn-nav' do %>
+      Próximo Mês →
+    <% end %>
+
+    <%= link_to 'Voltar para Hoje', estatisticas_habito_path(@habito), class: 'btn btn-hoje' %>
+  </div>
+
+  <!-- Cards de Estatísticas Principais -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <div class="stat-label">Taxa de Conclusão</div>
+        <div class="stat-value <%= @estatisticas[:taxa_conclusao] >= 80 ? 'success' : @estatisticas[:taxa_conclusao] >= 50 ? 'warning' : 'danger' %>">
+          <%= @estatisticas[:taxa_conclusao] %>%
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info">
+        <div class="stat-label">Dias Feitos</div>
+        <div class="stat-value">
+          <%= @estatisticas[:dias_feitos] %> / <%= @estatisticas[:dias_agendados_passados] %>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">❌</div>
+      <div class="stat-info">
+        <div class="stat-label">Dias Não Feitos</div>
+        <div class="stat-value danger">
+          <%= @estatisticas[:dias_nao_feitos] %>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-info">
+        <div class="stat-label">Dias Agendados (Total)</div>
+        <div class="stat-value">
+          <%= @estatisticas[:dias_agendados_total] %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico de Progresso Diário -->
+  <div class="grafico-section">
+    <h3>Progresso Diário do Mês</h3>
+    <div class="grafico-barras">
+      <% @estatisticas[:serie_dias].each do |dia_info| %>
+        <%
+          dia = dia_info[:data]
+          agendado = dia_info[:agendado]
+          feito = dia_info[:feito]
+          passado = dia_info[:passado]
+          hoje = dia == Date.today
+
+          # Prioridade: feito > hoje > não agendado > futuro > não feito
+          css_class = if feito
+            'barra-feito'
+          elsif hoje && agendado
+            'barra-hoje'
+          elsif !agendado
+            'barra-nao-agendado'
+          elsif !passado
+            'barra-futuro'
+          else
+            'barra-nao-feito'
+          end
+        %>
+
+        <div class="barra-wrapper" title="<%= dia.strftime('%d/%m/%Y - %A') %>">
+          <div class="barra <%= css_class %> <%= 'barra-hoje-destaque' if hoje %>">
+            <span class="barra-label"><%= dia.day %></span>
+          </div>
+          <div class="barra-dia-semana"><%= dia.strftime('%a')[0] %></div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Legenda do Gráfico -->
+    <div class="grafico-legenda">
+      <div class="legenda-item"><span class="cor-demo barra-feito"></span> Feito</div>
+      <div class="legenda-item"><span class="cor-demo barra-hoje"></span> Hoje</div>
+      <div class="legenda-item"><span class="cor-demo barra-nao-feito"></span> Não feito</div>
+      <div class="legenda-item"><span class="cor-demo barra-futuro"></span> Futuro</div>
+      <div class="legenda-item"><span class="cor-demo barra-nao-agendado"></span> Não agendado</div>
+    </div>
+  </div>
+
+  <!-- Calendário Visual do Mês -->
+  <div class="calendario-visual-section">
+    <h3>Calendário do Mês</h3>
+    <div class="calendario-grid-pequeno">
+      <!-- Cabeçalho dos dias da semana -->
+      <% %w[Dom Seg Ter Qua Qui Sex Sáb].each do |dia| %>
+        <div class="dia-semana-header-pequeno"><%= dia %></div>
+      <% end %>
+
+      <!-- Dias vazios no início -->
+      <% Date.new(@ano, @mes, 1).wday.times do %>
+        <div class="dia-vazio-pequeno"></div>
+      <% end %>
+
+      <!-- Dias do mês -->
+      <% @estatisticas[:serie_dias].each do |dia_info| %>
+        <%
+          dia = dia_info[:data]
+          agendado = dia_info[:agendado]
+          feito = dia_info[:feito]
+          passado = dia_info[:passado]
+          hoje = dia == Date.today
+
+          # Prioridade: feito > hoje > não agendado > futuro > não feito
+          css_class = if feito
+            'dia-cal-feito'
+          elsif hoje && agendado
+            'dia-cal-hoje'
+          elsif !agendado
+            'dia-cal-nao-agendado'
+          elsif !passado
+            'dia-cal-futuro'
+          else
+            'dia-cal-nao-feito'
+          end
+        %>
+
+        <div class="dia-calendario-pequeno <%= css_class %>" title="<%= dia.strftime('%d/%m/%Y - %A') %>">
+          <%= dia.day %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Lista de Comentários/Observações -->
+  <% if @registros_com_observacao.any? %>
+    <div class="observacoes-section">
+      <h3>Comentários do Mês</h3>
+
+      <% @registros_com_observacao.each do |registro| %>
+        <div class="observacao-card">
+          <div class="observacao-header">
+            <div class="observacao-data">
+              <%= I18n.l(registro.data, format: :long) %>
+              <span class="dia-semana">(<%= I18n.t('date.day_names')[registro.data.wday] %>)</span>
+            </div>
+            <%= link_to 'Editar', edit_registro_path(registro), class: 'btn-edit-mini' %>
+          </div>
+          <div class="observacao-texto">
+            <%= simple_format(registro.observacao) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <p>Nenhum comentário registrado neste mês.</p>
+    </div>
+  <% end %>
+
+  <!-- Resumo Semanal -->
+  <div class="resumo-semanal-section">
+    <h3>Resumo por Semana</h3>
+
+    <%
+      # Agrupar dias por semana
+      semanas = @estatisticas[:serie_dias].group_by { |d| d[:data].cweek }
+    %>
+
+    <div class="semanas-grid">
+      <% semanas.each_with_index do |(numero_semana, dias_semana), index| %>
+        <%
+          dias_agendados_semana = dias_semana.count { |d| d[:agendado] && d[:passado] }
+          dias_feitos_semana = dias_semana.count { |d| d[:feito] && d[:passado] }
+          taxa_semana = dias_agendados_semana > 0 ? (dias_feitos_semana.to_f / dias_agendados_semana * 100).round : 0
+        %>
+
+        <div class="semana-card">
+          <div class="semana-header">
+            <strong>Semana <%= index + 1 %></strong>
+            <span class="semana-periodo">
+              <%= dias_semana.first[:data].day %>-<%= dias_semana.last[:data].day %> <%= I18n.t("date.month_names")[@mes] %>
+            </span>
+          </div>
+          <div class="semana-stats">
+            <div class="semana-stat">
+              <span class="label">Feitos:</span>
+              <span class="valor"><%= dias_feitos_semana %> / <%= dias_agendados_semana %></span>
+            </div>
+            <div class="semana-stat">
+              <span class="label">Taxa:</span>
+              <span class="valor <%= taxa_semana >= 80 ? 'success' : taxa_semana >= 50 ? 'warning' : 'danger' %>">
+                <%= taxa_semana %>%
+              </span>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .stat-info {
+    flex: 1;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .stat-value.success { color: #28a745; }
+  .stat-value.warning { color: #ffc107; }
+  .stat-value.danger { color: #dc3545; }
+
+  /* Gráfico de Barras */
+  .grafico-section {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .grafico-barras {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 150px;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+
+  .barra-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 20px;
+  }
+
+  .barra {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .barra:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  .barra-hoje-destaque {
+    border: 2px solid #333;
+  }
+
+  .barra-label {
+    font-size: 0.7rem;
+    color: white;
+    font-weight: bold;
+    padding: 2px;
+  }
+
+  .barra-dia-semana {
+    font-size: 0.7rem;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .barra-feito { background: #28a745; }
+  .barra-hoje { background: #007bff; }
+  .barra-nao-feito { background: #dc3545; }
+  .barra-futuro { background: #e9ecef; }
+  .barra-nao-agendado { background: #f8f9fa; border: 1px solid #dee2e6; }
+
+  .grafico-legenda {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .cor-demo {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+  }
+
+  /* Calendário Visual */
+  .calendario-visual-section {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .calendario-grid-pequeno {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-top: 1rem;
+  }
+
+  .dia-semana-header-pequeno {
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+  }
+
+  .dia-calendario-pequeno {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .dia-calendario-pequeno:hover {
+    transform: scale(1.1);
+  }
+
+  .dia-vazio-pequeno {
+    aspect-ratio: 1;
+  }
+
+  .dia-cal-feito { background: #28a745; color: white; }
+  .dia-cal-hoje { background: #007bff; color: white; }
+  .dia-cal-nao-feito { background: #dc3545; color: white; }
+  .dia-cal-futuro { background: #e9ecef; color: #6c757d; }
+  .dia-cal-nao-agendado { background: #f8f9fa; color: #adb5bd; border: 1px solid #dee2e6; }
+
+  /* Observações */
+  .observacoes-section {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .observacao-card {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #007bff;
+  }
+
+  .observacao-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .observacao-data {
+    font-weight: bold;
+    color: #333;
+  }
+
+  .dia-semana {
+    color: #666;
+    font-weight: normal;
+    font-size: 0.875rem;
+  }
+
+  .observacao-texto {
+    color: #495057;
+    line-height: 1.5;
+  }
+
+  /* Resumo Semanal */
+  .resumo-semanal-section {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .semanas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .semana-card {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+  }
+
+  .semana-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .semana-periodo {
+    font-size: 0.875rem;
+    color: #666;
+  }
+
+  .semana-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .semana-stat {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .semana-stat .label {
+    color: #666;
+  }
+
+  .semana-stat .valor {
+    font-weight: bold;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: #6c757d;
+    margin: 2rem 0;
+  }
+</style>

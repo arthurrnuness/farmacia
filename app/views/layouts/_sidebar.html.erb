@@ -1,0 +1,121 @@
+<!-- Sidebar Partial -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <%= link_to dashboard_path, class: 'sidebar-brand' do %>
+      <span class="sidebar-brand-icon">📊</span>
+      <span class="sidebar-brand-text">Meus Hábitos</span>
+    <% end %>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-nav-section">
+      <div class="sidebar-nav-title">Principal</div>
+      <%= link_to dashboard_path, class: "sidebar-nav-item #{current_page?(dashboard_path) ? 'active' : ''}" do %>
+        <span class="sidebar-nav-icon">🏠</span>
+        <span>Dashboard</span>
+      <% end %>
+
+      <%= link_to dashboard_grid_path, class: "sidebar-nav-item #{current_page?(dashboard_grid_path) ? 'active' : ''}" do %>
+        <span class="sidebar-nav-icon">📅</span>
+        <span>Grade</span>
+      <% end %>
+
+      <%= link_to review_path, class: "sidebar-nav-item #{current_page?(review_path) ? 'active' : ''}" do %>
+        <span class="sidebar-nav-icon">📖</span>
+        <span>Review</span>
+      <% end %>
+    </div>
+
+    <div class="sidebar-nav-section">
+      <div class="sidebar-nav-title">Hábitos</div>
+      <%= link_to new_habito_path, class: "sidebar-nav-item #{current_page?(new_habito_path) ? 'active' : ''}" do %>
+        <span class="sidebar-nav-icon">➕</span>
+        <span>Novo Hábito</span>
+      <% end %>
+
+      <% if defined?(current_user) && current_user %>
+        <% current_user.habitos.order(:nome).limit(5).each do |habito| %>
+          <%= link_to habito_path(habito), class: "sidebar-nav-item #{current_page?(habito_path(habito)) ? 'active' : ''}" do %>
+            <span class="sidebar-nav-icon">•</span>
+            <span><%= truncate(habito.nome, length: 20) %></span>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="sidebar-nav-section">
+      <div class="sidebar-nav-title">Configurações</div>
+      <%= link_to settings_path, class: "sidebar-nav-item #{current_page?(settings_path) ? 'active' : ''}" do %>
+        <span class="sidebar-nav-icon">⚙️</span>
+        <span>Configurações</span>
+      <% end %>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <% if defined?(current_user) && current_user %>
+      <%= button_to destroy_user_session_path, method: :delete, class: 'sidebar-logout' do %>
+        <span class="sidebar-nav-icon">🚪</span>
+        <span>Sair</span>
+      <% end %>
+
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">
+          <%= current_user.email.first.upcase %>
+        </div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name"><%= current_user.email.split('@').first %></div>
+          <div class="sidebar-user-email"><%= truncate(current_user.email, length: 20) %></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</aside>
+
+<!-- Sidebar Collapse Button (Desktop) -->
+<button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Recolher barra lateral">
+  <span class="collapse-icon">←</span>
+</button>
+
+<!-- Mobile Sidebar Toggle -->
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<!-- Sidebar Backdrop for Mobile -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<script>
+  // Sidebar Toggle for Mobile and Collapse for Desktop
+  document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+    const mainContent = document.querySelector('.main-content');
+
+    // Mobile toggle
+    function toggleSidebar() {
+      sidebar.classList.toggle('open');
+      sidebarBackdrop.classList.toggle('show');
+    }
+
+    // Desktop collapse
+    function toggleCollapse() {
+      sidebar.classList.toggle('collapsed');
+      mainContent.classList.toggle('sidebar-collapsed');
+      const icon = sidebarCollapseBtn.querySelector('.collapse-icon');
+      icon.textContent = sidebar.classList.contains('collapsed') ? '→' : '←';
+    }
+
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', toggleSidebar);
+    }
+
+    if (sidebarBackdrop) {
+      sidebarBackdrop.addEventListener('click', toggleSidebar);
+    }
+
+    if (sidebarCollapseBtn) {
+      sidebarCollapseBtn.addEventListener('click', toggleCollapse);
+    }
+  });
+</script>

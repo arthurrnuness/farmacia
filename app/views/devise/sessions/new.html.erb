@@ -1,0 +1,53 @@
+<% content_for :title, "Login - habi.my" %>
+
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <span class="logo-icon">📊</span>
+        <span class="logo-text">habi.my</span>
+      </div>
+      <h1>Bem-vindo de volta</h1>
+      <p class="auth-subtitle">Entre para continuar acompanhando seus hábitos</p>
+    </div>
+
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: 'auth-form' }) do |f| %>
+      <% if alert %>
+        <div class="alert alert-error">
+          <%= alert %>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <%= f.label :email, "E-mail", class: 'form-label' %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'form-input', placeholder: 'seu@email.com' %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :password, "Senha", class: 'form-label' %>
+        <%= f.password_field :password, autocomplete: "current-password", class: 'form-input', placeholder: '••••••••' %>
+      </div>
+
+      <div class="form-options">
+        <% if devise_mapping.rememberable? %>
+          <label class="checkbox-label">
+            <%= f.check_box :remember_me, class: 'form-checkbox' %>
+            <span>Lembrar de mim</span>
+          </label>
+        <% end %>
+
+        <% if devise_mapping.recoverable? %>
+          <%= link_to "Esqueceu a senha?", new_password_path(resource_name), class: 'link-secondary' %>
+        <% end %>
+      </div>
+
+      <div class="form-actions">
+        <%= f.submit "Entrar", class: 'btn btn-primary btn-block' %>
+      </div>
+    <% end %>
+
+    <div class="auth-footer">
+      <p>Não tem uma conta? <%= link_to "Criar conta", new_registration_path(resource_name), class: 'link-primary' %></p>
+    </div>
+  </div>
+</div>

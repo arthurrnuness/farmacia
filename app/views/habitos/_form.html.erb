@@ -1,55 +1,119 @@
-<%= form_with(model: @habito, local: true) do |form| %>
-  <% if @habito.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(@habito.errors.count, "erro") %> encontrado:</h2>
-
+<%= form_with(model: habito, class: 'habit-form') do |f| %>
+  <% if habito.errors.any? %>
+    <div class="alert alert-error">
+      <h3><%= pluralize(habito.errors.count, "erro") %> impediram o salvamento:</h3>
       <ul>
-        <% @habito.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+        <% habito.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-
-  <div>
-    <%= form.label :nome, style: "display: block" %>
-    <%= form.text_field :nome %>
+  <!-- Nome field -->
+  <div class="form-field">
+    <%= f.label :nome, "Nome do Hábito", class: 'form-label' %>
+    <%= f.text_field :nome, class: 'form-input', placeholder: 'Ex: Meditar, Ler, Exercitar' %>
   </div>
 
-  <div>
-    <%= form.label :descricao, style: "display: block" %>
-    <%= form.textarea :descricao %>
+  <!-- Descrição field -->
+  <div class="form-field">
+    <%= f.label :descricao, "Descrição (opcional)", class: 'form-label' %>
+    <%= f.text_area :descricao, rows: 3, class: 'form-textarea', placeholder: 'Descreva seu hábito...' %>
   </div>
 
-  <div>
-    <%= form.label :frequencia_semanal, style: "display: block" %>
-    <%= form.number_field :frequencia_semanal %>
+  <!-- Frequência semanal field -->
+  <div class="form-field">
+    <%= f.label :frequencia_semanal, "Meta Semanal", class: 'form-label' %>
+    <span class="form-hint">Quantas vezes por semana você quer realizar este hábito?</span>
+    <%= f.number_field :frequencia_semanal, min: 1, max: 7, class: 'form-input', placeholder: '7' %>
   </div>
 
-  <div class="form-group">
-    <%= form.label :dias_semana, 'Dias da semana *' %>
-    <div class="dias-semana-checkboxes">
-      <% [['Segunda', 'monday'], ['Terça', 'tuesday'], ['Quarta', 'wednesday'],
-          ['Quinta', 'thursday'], ['Sexta', 'friday'], ['Sábado', 'saturday'],
-          ['Domingo', 'sunday']].each do |nome, valor| %>
-        <label class="checkbox-inline">
-          <%= check_box_tag 'habito[dias_semana][]', valor,
-                            @habito.dias_semana&.include?(valor) %>
-          <%= nome %>
+  <!-- Dias da semana field - NEW DESIGN -->
+  <div class="form-field">
+    <%= f.label :dias_semana, "Dias da Semana", class: 'form-label' %>
+
+    <div class="day-quick-actions">
+      <button type="button" class="btn-select-all-days" id="selectAllDays">
+        <span class="btn-icon">✓</span>
+        Todos os dias
+      </button>
+    </div>
+
+    <div class="days-selector">
+      <% dias = {
+        'Seg' => 'monday',
+        'Ter' => 'tuesday',
+        'Qua' => 'wednesday',
+        'Qui' => 'thursday',
+        'Sex' => 'friday',
+        'Sáb' => 'saturday',
+        'Dom' => 'sunday'
+      } %>
+
+      <% dias.each do |label, value| %>
+        <label class="day-pill">
+          <input type="checkbox"
+                 name="habito[dias_semana][]"
+                 value="<%= value %>"
+                 <%= 'checked' if habito.dias_semana&.include?(value) %>
+                 class="day-checkbox">
+          <span class="day-label"><%= label %></span>
         </label>
       <% end %>
     </div>
   </div>
 
-  <%= render 'tag_selector', form: form %>
+  <!-- Tags field - Keep existing partial -->
+  <%= render 'habitos/tag_selector', form: f %>
 
-  <div>
-    <%= form.label :ativo, style: "display: block" %>
-    <%= form.checkbox :ativo %>
+  <!-- Ativo checkbox -->
+  <div class="form-field">
+    <label class="checkbox-field">
+      <%= f.check_box :ativo, class: 'form-checkbox' %>
+      <span>Hábito ativo (aparecerá no dashboard)</span>
+    </label>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <!-- Form actions -->
+  <div class="form-actions">
+    <%= link_to 'Cancelar', dashboard_path, class: 'btn btn-secondary' %>
+    <%= f.submit 'Salvar Hábito', class: 'btn btn-primary' %>
   </div>
 <% end %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const selectAllBtn = document.getElementById('selectAllDays');
+  const dayCheckboxes = document.querySelectorAll('.day-checkbox');
+
+  // Select all days when button clicked
+  if (selectAllBtn) {
+    selectAllBtn.addEventListener('click', function() {
+      dayCheckboxes.forEach(checkbox => {
+        checkbox.checked = true;
+        updateDayPillState(checkbox);
+      });
+    });
+  }
+
+  // Update pill visual state on individual checkbox change
+  dayCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      updateDayPillState(this);
+    });
+
+    // Initialize state on page load
+    updateDayPillState(checkbox);
+  });
+
+  function updateDayPillState(checkbox) {
+    const pill = checkbox.closest('.day-pill');
+    if (checkbox.checked) {
+      pill.classList.add('active');
+    } else {
+      pill.classList.remove('active');
+    }
+  }
+});
+</script>

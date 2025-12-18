@@ -1,0 +1,98 @@
+/* Sidebar Logout Button */
+.sidebar-logout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: #ececec;
+  font-size: 14px;
+  font-weight: 400;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+}
+
+.sidebar-logout:hover {
+  background: #2a2b2e;
+}
+
+/* Sidebar Collapse Button */
+.sidebar-collapse-btn {
+  position: fixed;
+  left: 260px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 48px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  transition: all 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-collapse-btn:hover {
+  background: #f7f7f8;
+}
+
+.collapse-icon {
+  font-size: 16px;
+  color: #6b7280;
+}
+
+/* Collapsed Sidebar State */
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar.collapsed .sidebar-brand-text,
+.sidebar.collapsed .sidebar-nav-title,
+.sidebar.collapsed .sidebar-nav-item span:not(.sidebar-nav-icon),
+.sidebar.collapsed .sidebar-user-info {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-brand {
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-nav-item {
+  justify-content: center;
+  padding: 0.625rem;
+}
+
+.sidebar.collapsed .sidebar-user {
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-logout {
+  justify-content: center;
+}
+
+/* Adjust collapse button position when sidebar is collapsed */
+.sidebar.collapsed + .sidebar-collapse-btn {
+  left: 70px;
+}
+
+/* Adjust main content when sidebar is collapsed */
+.main-content.sidebar-collapsed {
+  margin-left: 70px;
+}
+
+/* Hide collapse button on mobile */
+@media (max-width: 768px) {
+  .sidebar-collapse-btn {
+    display: none;
+  }
+}

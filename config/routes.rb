@@ -2,17 +2,22 @@ require 'sidekiq/web'
 Rails.application.routes.draw do
   devise_for :users
 
+  # Landing page
+  root 'landing#index'
+
   # Settings routes
   get 'settings', to: 'settings#index', as: 'settings'
   get 'settings/export', to: 'settings#export', as: 'settings_export'
   post 'settings/import', to: 'settings#import', as: 'settings_import'
-  get 'settings/review', to: 'settings#review', as: 'settings_review'
 
-  root 'dashboard#index'
+  # Review routes
+  get 'review', to: 'settings#review_page', as: 'review'
+  get 'review/data', to: 'settings#review', as: 'review_data'
 
   resources :habitos do
     member do
       get 'progresso'
+      get 'estatisticas'
     end
   end
   resources :registros, only: [:new, :create, :edit, :update]
