@@ -43,6 +43,13 @@ class PaymentsController < ApplicationController
 
   # Redirecionar para o Customer Portal do Stripe
   def portal
+    # Verificar se usuário tem stripe_customer_id (já fez algum pagamento)
+    unless current_user.stripe_customer_id.present?
+      flash[:alert] = "Você precisa ter uma assinatura ativa para acessar o portal de gerenciamento."
+      redirect_to pricing_path
+      return
+    end
+
     # Criar sessão do Customer Portal
     session = Stripe::BillingPortal::Session.create({
       customer: current_user.stripe_customer_id,

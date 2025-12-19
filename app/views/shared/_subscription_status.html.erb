@@ -90,10 +90,10 @@
 }
 </style>
 
-<div class="subscription-status <%= current_user.premium? && !current_user.on_trial? ? 'premium' : (current_user.on_trial? ? 'trial' : 'free') %>">
+<div class="subscription-status <%= current_user.premium_paid? ? 'premium' : (current_user.on_trial? ? 'trial' : 'free') %>">
   <div class="status-content">
     <div class="status-info">
-      <% if current_user.premium? && !current_user.on_trial? %>
+      <% if current_user.premium_paid? %>
         <!-- Premium pago -->
         <div class="status-badge">
           <span>✨</span>
@@ -135,7 +135,7 @@
     </div>
 
     <div class="status-actions">
-      <% if current_user.premium? && !current_user.on_trial? %>
+      <% if current_user.premium_paid? %>
         <!-- Botão para gerenciar assinatura -->
         <%= link_to payments_portal_path, class: 'btn-status btn-manage' do %>
           ⚙️ Gerenciar Assinatura

@@ -23,6 +23,11 @@ class User < ApplicationRecord
     premium == true || on_trial?
   end
 
+  # Verifica se tem premium PAGO (não trial)
+  def premium_paid?
+    premium == true && stripe_customer_id.present?
+  end
+
   # Verifica se pode criar mais hábitos
   def can_create_habito?
     premium? || habitos.count < 4

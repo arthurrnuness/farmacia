@@ -234,8 +234,11 @@
     <% if current_user.on_trial? %>
       <div class="status-banner trial">
         <strong>Trial ativo!</strong> Você tem <%= current_user.trial_days_remaining %> <%= current_user.trial_days_remaining == 1 ? 'dia' : 'dias' %> restantes de acesso premium gratuito.
+        <% if current_user.trial_ending_soon? %>
+          <br><strong>⚡ Faça upgrade agora e não perca o acesso!</strong>
+        <% end %>
       </div>
-    <% elsif current_user.premium? %>
+    <% elsif current_user.premium_paid? %>
       <div class="status-banner premium">
         <strong>Você é Premium!</strong> Obrigado por apoiar o desenvolvimento do app.
         <%= link_to 'Gerenciar assinatura', payments_portal_path, style: 'color: #1b5e20; text-decoration: underline; margin-left: 10px;' %>
@@ -302,7 +305,7 @@
       </ul>
 
       <% if user_signed_in? %>
-        <% if current_user.premium? %>
+        <% if current_user.premium_paid? %>
           <%= link_to 'Gerenciar Assinatura', payments_portal_path, class: 'btn-subscribe btn-primary' %>
         <% else %>
           <%= form_with url: payments_checkout_path, method: :post, data: { turbo: false } do |form| %>
@@ -338,7 +341,7 @@
       </ul>
 
       <% if user_signed_in? %>
-        <% if current_user.premium? %>
+        <% if current_user.premium_paid? %>
           <%= link_to 'Gerenciar Assinatura', payments_portal_path, class: 'btn-subscribe btn-primary' %>
         <% else %>
           <%= form_with url: payments_checkout_path, method: :post, data: { turbo: false } do |form| %>
