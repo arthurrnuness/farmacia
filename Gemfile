@@ -72,6 +72,8 @@ gem 'whenever', require: false
 gem 'rufus-scheduler'
 
 gem 'devise'
+gem 'omniauth-google-oauth2'
+gem 'omniauth-rails_csrf_protection'
 gem 'stripe'
 
 # Excel export/import

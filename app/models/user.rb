@@ -2,7 +2,8 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable,
+         :omniauthable, omniauth_providers: [:google_oauth2]
 
   has_many :habitos, dependent: :destroy
   has_many :registros, through: :habitos
@@ -51,6 +52,15 @@ class User < ApplicationRecord
   # Verifica se o trial está próximo do fim (últimos 2 dias)
   def trial_ending_soon?
     on_trial? && trial_days_remaining <= 2
+  end
+
+  # OmniAuth callback - cria ou encontra usuário baseado em dados do Google
+  def self.from_omniauth(auth)
+    where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
+      user.email = auth.info.email
+      user.password = Devise.friendly_token[0, 20]
+      # O callback after_create :start_trial irá iniciar o trial automaticamente
+    end
   end
 
   private

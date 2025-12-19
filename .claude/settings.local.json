@@ -17,7 +17,8 @@
       "Bash(rails routes:*)",
       "Bash(powershell -Command:*)",
       "Bash(bundle show:*)",
-      "Bash(rails runner:*)"
+      "Bash(rails runner:*)",
+      "Bash(rails credentials:show:*)"
     ],
     "deny": [],
     "ask": []
