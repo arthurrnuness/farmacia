@@ -1,8 +1,10 @@
 class PaymentsController < ApplicationController
-  before_action :authenticate_user!
+  # Skip autenticação global do ApplicationController para pricing
+  skip_before_action :authenticate_user!, only: [:pricing]
 
   # Página de pricing com planos disponíveis
   def pricing
+    # Página pública - acessível para todos
   end
 
   # Criar sessão do Stripe Checkout com plano escolhido

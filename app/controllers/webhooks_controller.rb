@@ -1,6 +1,8 @@
 class WebhooksController < ApplicationController
   # Skip CSRF token verification para webhooks do Stripe
   skip_before_action :verify_authenticity_token
+  # Skip autenticação do Devise - webhooks não têm sessão de usuário
+  skip_before_action :authenticate_user!, raise: false
 
   def stripe
     payload = request.body.read

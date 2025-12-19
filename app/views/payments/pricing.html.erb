@@ -230,19 +230,26 @@
     <p>Transforme seus hábitos com o plano que funciona para você</p>
   </div>
 
-  <% if current_user.on_trial? %>
+  <% if user_signed_in? %>
+    <% if current_user.on_trial? %>
+      <div class="status-banner trial">
+        <strong>Trial ativo!</strong> Você tem <%= current_user.trial_days_remaining %> <%= current_user.trial_days_remaining == 1 ? 'dia' : 'dias' %> restantes de acesso premium gratuito.
+      </div>
+    <% elsif current_user.premium? %>
+      <div class="status-banner premium">
+        <strong>Você é Premium!</strong> Obrigado por apoiar o desenvolvimento do app.
+        <%= link_to 'Gerenciar assinatura', payments_portal_path, style: 'color: #1b5e20; text-decoration: underline; margin-left: 10px;' %>
+      </div>
+    <% elsif current_user.habitos.count >= 4 %>
+      <div class="status-banner">
+        <strong>Limite atingido!</strong> Você está usando <%= current_user.habitos.count %>/4 hábitos disponíveis no plano gratuito.
+        Faça upgrade para criar hábitos ilimitados!
+      </div>
+    <% end %>
+  <% else %>
     <div class="status-banner trial">
-      <strong>Trial ativo!</strong> Você tem <%= current_user.trial_days_remaining %> <%= current_user.trial_days_remaining == 1 ? 'dia' : 'dias' %> restantes de acesso premium gratuito.
-    </div>
-  <% elsif current_user.premium? %>
-    <div class="status-banner premium">
-      <strong>Você é Premium!</strong> Obrigado por apoiar o desenvolvimento do app.
-      <%= link_to 'Gerenciar assinatura', payments_portal_path, style: 'color: #1b5e20; text-decoration: underline; margin-left: 10px;' %>
-    </div>
-  <% elsif current_user.habitos.count >= 4 %>
-    <div class="status-banner">
-      <strong>Limite atingido!</strong> Você está usando <%= current_user.habitos.count %>/4 hábitos disponíveis no plano gratuito.
-      Faça upgrade para criar hábitos ilimitados!
+      <strong>Novo por aqui?</strong> Crie uma conta e ganhe 7 dias de trial premium gratuito!
+      <%= link_to 'Criar conta', new_user_registration_path, style: 'color: #0d47a1; text-decoration: underline; margin-left: 10px;' %>
     </div>
   <% end %>
 
@@ -267,8 +274,10 @@
         <li class="not-included">Suporte prioritário</li>
       </ul>
 
-      <% if !current_user.premium? && !current_user.on_trial? %>
+      <% if user_signed_in? && !current_user.premium? && !current_user.on_trial? %>
         <button class="btn-subscribe btn-current">Plano Atual</button>
+      <% elsif !user_signed_in? %>
+        <%= link_to 'Começar Grátis', new_user_registration_path, class: 'btn-subscribe btn-primary', style: 'text-align: center; line-height: 1.5;' %>
       <% end %>
     </div>
 
@@ -292,13 +301,17 @@
         <li>Suporte prioritário</li>
       </ul>
 
-      <% if current_user.premium? %>
-        <%= link_to 'Gerenciar Assinatura', payments_portal_path, class: 'btn-subscribe btn-primary' %>
-      <% else %>
-        <%= form_with url: payments_checkout_path, method: :post, data: { turbo: false } do |form| %>
-          <%= hidden_field_tag :plan, 'monthly' %>
-          <%= form.submit "Assinar Mensal", class: 'btn-subscribe btn-primary' %>
+      <% if user_signed_in? %>
+        <% if current_user.premium? %>
+          <%= link_to 'Gerenciar Assinatura', payments_portal_path, class: 'btn-subscribe btn-primary' %>
+        <% else %>
+          <%= form_with url: payments_checkout_path, method: :post, data: { turbo: false } do |form| %>
+            <%= hidden_field_tag :plan, 'monthly' %>
+            <%= form.submit "Assinar Mensal", class: 'btn-subscribe btn-primary' %>
+          <% end %>
         <% end %>
+      <% else %>
+        <%= link_to 'Criar Conta para Assinar', new_user_registration_path, class: 'btn-subscribe btn-primary', style: 'text-align: center; line-height: 1.5;' %>
       <% end %>
     </div>
 
@@ -324,13 +337,17 @@
         <li>Suporte prioritário</li>
       </ul>
 
-      <% if current_user.premium? %>
-        <%= link_to 'Gerenciar Assinatura', payments_portal_path, class: 'btn-subscribe btn-primary' %>
-      <% else %>
-        <%= form_with url: payments_checkout_path, method: :post, data: { turbo: false } do |form| %>
-          <%= hidden_field_tag :plan, 'yearly' %>
-          <%= form.submit "Assinar Anual", class: 'btn-subscribe btn-primary' %>
+      <% if user_signed_in? %>
+        <% if current_user.premium? %>
+          <%= link_to 'Gerenciar Assinatura', payments_portal_path, class: 'btn-subscribe btn-primary' %>
+        <% else %>
+          <%= form_with url: payments_checkout_path, method: :post, data: { turbo: false } do |form| %>
+            <%= hidden_field_tag :plan, 'yearly' %>
+            <%= form.submit "Assinar Anual", class: 'btn-subscribe btn-primary' %>
+          <% end %>
         <% end %>
+      <% else %>
+        <%= link_to 'Criar Conta para Assinar', new_user_registration_path, class: 'btn-subscribe btn-primary', style: 'text-align: center; line-height: 1.5;' %>
       <% end %>
     </div>
   </div>
@@ -369,6 +386,11 @@
   </div>
 
   <div class="back-link">
-    <%= link_to "← Voltar ao Dashboard", dashboard_path %>
+    <% if user_signed_in? %>
+      <%= link_to "← Voltar ao Dashboard", dashboard_path %>
+    <% else %>
+      <%= link_to "← Voltar à Home", root_path %> |
+      <%= link_to "Fazer Login", new_user_session_path %>
+    <% end %>
   </div>
 </div>
